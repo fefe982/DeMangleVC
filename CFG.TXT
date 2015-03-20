@@ -1,0 +1,149 @@
+Ident :=
+    '?' QualifiedName IdentType
+
+QualifiedName :=
+    BaseName '@'
+    BaseName NameQualifier '@'
+
+BaseName :=
+    StringTemplateName
+    OperatorName
+
+NameQualifier :=
+    ClassNamespaceName
+    ClassNamespaceName NameQualifier
+
+ClassNamespaceName :=
+    StringTemplateName
+    AnoymousNamespaceName
+    '??' Ident              // `Ident'
+    '?'  IntConst           // `IntConst', IntConst here will not begin with A
+
+StringTemplateName :=
+    StringName
+    TemplateName
+    BackRefStringName
+
+StringName :=
+    "[_a-zA-Z][_0-9a-zA-Z]*" @
+
+TemplateName :=
+    '?$' StringName TplParaList
+
+BackRefStringName :=
+    "[1-9]"
+
+AnonymousNamespacename :
+    '?A0x' "[0-9a-f]{6}" '@'
+
+TplParaList :=
+    TplPara '@'
+    TplPara TplParaList
+
+TplPara :=
+    Type
+    IntTplPara
+    RefTplPara
+    CVQTplPara
+
+IntTplPara :=
+    '$0' IntConst
+
+IntConst :=
+    "[0-9]"           // 1 ~ 10
+    "[A-P][A-P]+" '@'    // other positive, A-P <-> 0-F
+    '?' "[0-9]"          // -1 ~ -10
+    '?' "[A-P][A-P]+" '@'   // other negtive
+
+RefTplPara :=
+    '$?' QualifiedName VariableType
+
+CVQTplPara :=
+    '$$' 'C' CVQ Type
+
+VariableType :=
+    VarAccMod Type VarCVQ
+
+VarAccMode :=
+    0   // private: static
+    3   // normal
+
+VarCVQ :=
+    A   // normal
+    B   // const
+    C   // volatile
+    D   // const volatile
+
+Type :=
+    BaseType        // int
+    RefType         // pointer, ref
+    CompoundType    // class
+    BackRefType
+
+RefType :=
+    RefSpLt CVQType
+    RefSpLt Func
+
+CVQType :=
+    CVQVar Type
+
+RefSpLt :=
+    A   // &
+    B   // & volatile
+    P   // *
+    Q   // * const
+    R   // * volatile
+    S   // * const volatile
+
+CompoundType :=
+    CompoundSpLt QualifiedName
+
+CompoundSpLt :=
+    T       // union
+    U       // struct
+    V       // class
+    W[0-7]  // enum
+
+Func :=
+    NonMemCVQFunc FuncP
+    MemCVQFunc ClassNamespaceList CVQThis FuncP
+
+CVQThis :=
+    CVQVar
+
+NonMemCVQFunc :=
+    6   // normal
+
+MemCVQFunc :=
+    8
+
+FuncP :=
+    CallConv RetType ParamList ThrowParamList
+
+ThrowParamList: =
+    ParamList
+
+ParamList :=
+    'X'                     // void
+    NonVoidParamList
+
+NonVoidParamList :=
+    NonVoidType '@'
+    NonVoidType 'Z'         // Z stands for ,... here
+    NonVoidType NonVoidParamList
+
+RetType :=
+    Type
+
+IdentType :=
+    VariableType
+    NonMemFuncMod FuncP
+    MemFuncMod CVQThis FuncP
+    ThunkFuncMod ThunkAdjustor CVQThis FuncP
+
+ThunkAdjustor :=
+    IntConst
+
+BaseType :=
+    NonVoidType
+    'X'         // void

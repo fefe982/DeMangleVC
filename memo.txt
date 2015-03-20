@@ -1,0 +1,189 @@
+Some regular expressions:
+^\@ILT\+:z\({.*}\)\:\n:h:b+jmp:b+{.*}:b\(:hh\):b$
+^\@ILT\+:z\(\?.*\)\:\n:h:b+jmp:b+{.*}:b\(:hh\):b$
+^\@ILT\+:z\([^?].*\)\:\n:h:b+jmp:b+{.*}:b\(:hh\):b\n
+
+NonMemFuncMod, MemFuncMod
+          private protected public non-member
+---       ---     ---       ---    Y          // NonMemFuncMod
+this      A       I         Q      ---        // MemFuncMod
+static    C       K         S      ---        // MemFuncMod
+virtual   E       M         U      ---        // MemFuncMod
+[thunk]   G       O         W      ---        // ThunkFuncMod , these are all virtual
+
+OperatorName (starts with '?', which means '?2' is operator new, '?_2' is operator>>=)
+                    prefixed with '_'                       prefixed with '__'
+0  ctor             operator/=
+1  dtor             operator%=
+2  operator new     operator>>=
+3  operator delete  operator<<=
+4  operator=        operator&=
+5  operator>>       operator|=
+6  operator<<       operator^=
+7  operator!        `vftable'
+8  operator==       `vbtable'
+9  operator!=       `vcall'
+A  operator[]       `typeof'                                `managed vector constructor iterator'
+B  type conversion  `local static guard'                    `managed vector destructor iterator'
+C  operator->                                               `eh vector copy constructor iterator'
+D  operator*        `vbase destructor'                      `eh vector vbase copy constructor iterator'
+E  operator++       `vector deleting destructor'            `dynamic initializer for '.''
+F  operator--       `default constructor closure'           `dynamic atexit destructor for '.''
+G  operator-        `scalar deleting destructor'            `vector copy constructor iterator'
+H  operator+        `vector constructor iterator'
+I  operator&        `vector destructor iterator'
+J  operator->*      `vector vbase constructor iterator'
+K  operator/        `virtual displacement map'
+L  operator%        `eh vector constructor iterator'
+M  operator<        `eh vector destructor iterator'
+N  operator<=       `eh vector vbase constructor iterator'
+O  operator>        `copy constructor closure'
+P  operator>=
+Q  operator,
+R  operator()
+S  operator~        `local vftable'
+T  operator^        `local vftable constructor closure'
+U  operator|        operator new[]
+V  operator&&       operator delete[]
+W  operator||
+X  operator*=       `placement delete closure'
+Y  operator+=       `placement delete[] closure'
+Z  operator-=
+
+Type
+                       prefixed with '_'
+A "&"
+B "& volatile"
+C signed char
+D char                 __int8
+E unsigned char        unsigned __int8
+F short                __int16
+G unsigned short       unsigned __int16
+H int                  __int32
+I unsigned int         unsigned __int32
+J long                 __int64
+K unsigned long        unsigned __int64
+L                      __int128
+M float                unsigned __int128
+N double               bool
+O long double
+P "*"
+Q "* const"
+R "* volatile"
+S "* const volatile"
+T union
+U class
+V struct
+W enum                 wchar_t
+X void
+Y "[.]"
+Z
+
+
+`copy constructor closure'
+    function: compiler generated function
+    public: void __thiscall {0}::`copy constructor closure'(class {0} &)
+    act as a copy constructor. generated when the copy ctor is one has more than one params with default values
+    {0}: the class name
+    [1]: {class {0} &}: parameter of the copy constructor
+`default constructor closure'
+    function: compiler generated function
+    public: void __thiscall {0}::`default constructor closure'(void)
+    act as a constructor. generated when the defaule constructor is one with default parameter.
+    {0}: the class name
+`eh vector constructor iterator'
+    function: lib funtion
+    void __stdcall `eh vector constructor iterator'(void *,unsigned int,int,void (__thiscall *)(void *),void (__thiscall *)(void *))
+    called when an object (with non-trivial ctor & dtor) array construts.
+    [1]: {void *}: starting address of the array
+    [2]: {unsigned int}: size of one object
+    [3]: {int}: number of objects
+    [4]: {void (__thiscall *)(void *)}: pointer to the constructor (or `default constructor closure')
+    [5]: {void (__thiscall *)(void *)}: pointer to the destructor
+`eh vector copy constructor iterator'
+    function: lib function
+    void __stdcall `eh vector copy constructor iterator'(void *,void *,unsigned int,int,void (__thiscall*)(void *,void *),void (__thiscall*)(void *))
+    called in a default copy constructor, when there is an array of bojects (with non-trivial ctor & dtor) to copied.	
+    [1]: {void *}: destination (this)
+    [2]: {void *}: source (that)
+    [3]: {unsigned int}: size of the object
+    [4]: {int}: number of objects
+    [5]: {void (__thiscall*)(void *,void *)}: copy constructor
+    [6]: {void (__thiscall*)(void *)}: destructor
+`eh vector destructor iterator'
+    funtion: lib function:
+    void __stdcall `eh vector destructor iterator'(void *,unsigned int,int,void (__thiscall *)(void *))
+    called when an object array destructs
+    [1]: {void *}: start address of the array
+    [2]: {unsigned int}: size of one object
+    [3]: {int}: number of objects
+    [4]: {void (__thiscall *)(void *)}: pointer to the destructor
+`eh vector vbase constructor iterator'
+    function: lib function
+    void __stdcall `eh vector vbase constructor iterator'(void *,unsigned int,int,void (__thiscall*)(void *),void (__thiscall*)(void *))
+    called when an object(with non-trival ctor & dtor with a vitual base class) array is constructed
+    [1]: {void *}: starting address of the array
+    [2]: {unsigned int}: size of one object
+    [3]: {int}: number of objects
+    [4]: {void (__thiscall *)(void *)}: pointer to the constructor (or `default constructor closure')
+    [5]: {void (__thiscall *)(void *)}: pointer to the destructor    
+`eh vector vbase copy constructor iterator'
+`local static guard'
+`local vftable'
+`local vftable constructor closure'
+`managed vector constructor iterator'
+`managed vector destructor iterator'
+`placement delete closure'
+`placement delete[] closure'
+`scalar deleting destructor'
+    function: compiler generated function
+    public: void * __thiscall {0}::`scalar deleting destructor'(unsigned int)
+    called when a `delete' operator is used on an object pointer. calls the destructor and delete operator
+    {0}: the calss name
+    [1]: {unsigned int}: __flags (what flags??)
+`typeof'
+`vbase destructor'
+    function: compiler generated function
+    public: void __thiscall {0}::`vbase destructor'(void)
+    act as a destructor to a class with a virtual base
+    {0}: the class
+`vbtable'
+    data member
+    virtual base table (?) (for classes with virtual bases)
+`vcall'
+`vector constructor iterator'
+    function: lib function
+    void __stdcall `vector constructor iterator'(void *,unsigned int,int,void * (__thiscall*)(void *))
+    called when an object (with non-trivial ctor but trivial dtor) array construts.
+    [1]: {void *}: starting address of the array
+    [2]: {unsigned int}: size of one object
+    [3]: {int}: number of objects
+    [4]: {void * (__thiscall*)(void *)}: pointer to the constructor
+`vector copy constructor iterator'
+    function: compiler generated function
+    void __stdcall `vector copy constructor iterator'(void *,void *,unsigned int,int,void * (__thiscall *)(void *,void *))
+    called in a default copy constructor, when there is an array of bojects (with non-trivial ctor but trivial dtor) to copied.
+    [1]: {void *}: destination (this)
+    [2]: {void *}: source (that)
+    [3]: {unsigned int}: size of the object
+    [4]: {int}: number of objects
+    [5]: {void * (__thiscall *)(void *,void *)}: copy constructor
+`vector deleting destructor'
+    function: compiler generated function
+    public: void * __thiscall {0}::`vector deleting destructor'(unsigned int)
+    called when a `delete[]' operator is used on an object pointer. calls destructor and delete[] (maybe delete due to `__flags'?) operator
+    {0}: the class name
+    [1]: {unsigned int}: __flags (what flags??)
+`vector destructor iterator'
+`vector vbase constructor iterator'
+    function: lib function
+    void __stdcall `vector vbase constructor iterator'(void *,unsigned int,int,void * (__thiscall*)(void *))
+    called when an object(with non-trival ctor but trivial dtor with a vitual base class) array is constructed
+    [1]: {void *}: starting address of the array
+    [2]: {unsigned int}: size of one object
+    [3]: {int}: number of objects
+    [4]: {void * (__thiscall*)(void *)}: pointer to the constructor (or `default constructor closure')
+`vftable'
+    data member
+    virtual function table (?)
+`virtual displacement map'
