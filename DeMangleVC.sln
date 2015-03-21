@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CDEB645B-D0F9-4A46-8CFD-10EEEF2E4D1C}"
 	ProjectSection(SolutionItems) = preProject
 		CFG.TXT = CFG.TXT
@@ -40,6 +42,7 @@ Global
 		{A33656F3-142A-4916-804D-17F9B76B5B04}.Release|Win32.ActiveCfg = Release|Any CPU
 		{CEC774C0-67FA-4C6E-904A-C7A89577D335}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{CEC774C0-67FA-4C6E-904A-C7A89577D335}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{CEC774C0-67FA-4C6E-904A-C7A89577D335}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{CEC774C0-67FA-4C6E-904A-C7A89577D335}.Debug|Win32.ActiveCfg = Debug|Win32
 		{CEC774C0-67FA-4C6E-904A-C7A89577D335}.Debug|Win32.Build.0 = Debug|Win32
 		{CEC774C0-67FA-4C6E-904A-C7A89577D335}.Release|Any CPU.ActiveCfg = Release|Win32

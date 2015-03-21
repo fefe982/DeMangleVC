@@ -1,10 +1,10 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <boost/regex.hpp>
+#include <regex>
 
-boost::regex regexPROC("(\\?[^ \\t]+) PROC");
-boost::regex regexVAR("(\\?[^ \\t]+) D");
+std::regex regexPROC("(\\?[^ \\t]+) PROC");
+std::regex regexVAR("(\\?[^ \\t]+) D");
 
 int main(int argc, char **argv)
 {
@@ -17,12 +17,12 @@ int main(int argc, char **argv)
             std::string line;
             while (std::getline(isAsm, line))
             {
-                boost::smatch sm;
-                if (boost::regex_search(line, sm, regexPROC, boost::regex_constants::match_continuous))
+                std::smatch sm;
+                if (std::regex_search(line, sm, regexPROC, std::regex_constants::match_continuous))
                 {
                     std::cout << sm[1] << std::endl;
                 }
-                else if (boost::regex_search(line, sm, regexVAR, boost::regex_constants::match_continuous))
+                else if (std::regex_search(line, sm, regexVAR, std::regex_constants::match_continuous))
                 {
                     std::cout << sm[1] << std::endl;
                 }
