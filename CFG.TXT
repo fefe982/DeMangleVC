@@ -28,7 +28,7 @@ StringName :=
     "[_a-zA-Z][_0-9a-zA-Z]*" @
 
 TemplateName :=
-    '?$' StringName TplParaList
+    '?$' BaseName TplParaList
 
 BackRefStringName :=
     "[1-9]"

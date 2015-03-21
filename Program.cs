@@ -36,51 +36,22 @@ namespace DeMangleVC
                 }
             }
         }
-
     }
 
-    //class Declarator
-    //{
-    //    private String _strDeclarator;
-    //    public String strDeclarator
-    //    {
-    //        get { return _strDeclarator; }
-    //    }
-    //    public Declarator(String strDecl)
-    //    {
-    //        _strDeclarator = strDecl;
-    //    }
-    //    public Declarator(TypeID typeID, QualifiedID qID)
-    //    {
-    //        _strDeclarator = typeID.strType;
-    //        int iInsPosDecl = typeID.iInsPos;
-    //        //TypeID TN = new TypeID(this);
-    //        if (typeID.bNeedBlank && _strDeclarator != "")
-    //        {
-    //            _strDeclarator = _strDeclarator.Insert(iInsPosDecl, " ");
-    //            iInsPosDecl++;
-    //        }
-    //        if (typeID.bNeedBrackets)
-    //        {
-    //            _strDeclarator = _strDeclarator.Insert(iInsPosDecl, "(" + qID.strQualifiedID + ")");
-    //        }
-    //        else
-    //        {
-    //            _strDeclarator = _strDeclarator.Insert(iInsPosDecl, qID.strQualifiedID);
-    //        }
-    //    }
-
-    //    public Declarator Append(String suffix)
-    //    {
-    //        _strDeclarator = _strDeclarator.Insert(_strDeclarator.Length, suffix);
-    //        return this;
-    //    }
-    //    public Declarator InsertAtBegin(String prefix)
-    //    {
-    //        _strDeclarator = _strDeclarator.Insert(0, prefix);
-    //        return this;
-    //    }
-    //}
+    class StringHelper
+    {
+        public static string glue(string l, string r)
+        {
+            if (l == "" || r == "")
+            {
+                return l + r;
+            }
+            else
+            {
+                return l + " " + r;
+            }
+        }
+    }
 
     public enum enumTypes
     {
@@ -105,12 +76,7 @@ namespace DeMangleVC
         virtual public enumTypes getTypeKind() { throw new NotImplementedException(); }
         virtual public String getDeclaration(String qID, bool bEnclose = false)
         {
-            String typeString = getTypeString();
-            if (qID != "")
-            {
-                typeString += " " + qID;
-            }
-            return typeString;
+            return StringHelper.glue(getTypeString(), qID);
         }
     }
 
@@ -131,10 +97,7 @@ namespace DeMangleVC
         }
         public override string getDeclaration(string qID, bool hasBrackt = false)
         {
-            if (qID == "")
-                return _strType;
-            else
-                return _strType + " " + qID;
+            return StringHelper.glue(_strType, qID);
         }
     }
 
@@ -165,22 +128,14 @@ namespace DeMangleVC
         public override string getDeclaration(string qID, bool bEnclose = false)
         {
             String strDecl = "";
-            //switch (_typeReferenced.getTypeKind())
-            //{
-            //case enumTypes.enmSimple:
-            //    strDecl = _typeReferenced.getTypeString() + StrCVQualifier + _strReferenceType;
-            //    break;
-            //case enumTypes.enmFunctionBase:
             if (_strReferenceType.Length > 2)
             {
                 if (qID.StartsWith(_strReferenceType.Substring(2)))
                 {
-                    qID = qID.Substring(_strReferenceType.Length - 2);
+                    qID = qID.Substring(_strReferenceType.Length - 1);
                 }
             }
-                strDecl = _typeReferenced.getDeclaration(StrCVQualifier + _strReferenceType + qID,true);
-            //    break;
-            //}
+            strDecl = _typeReferenced.getDeclaration(StringHelper.glue(StrCVQualifier, StringHelper.glue(_strReferenceType, qID)), true);
             return strDecl;
         }
     }
@@ -211,15 +166,7 @@ namespace DeMangleVC
         public override string getDeclaration(string qID, bool hasBrackt = false)
         {
             String strDecl = "";
-            //switch (_typeReferenced.getTypeKind())
-            //{
-            //case enumTypes.enmSimple:
-            //    strDecl = _typeReferenced.getTypeString() + StrCVQualifier + _strReferenceType;
-            //    break;
-            //case enumTypes.enmFunctionBase:
-            strDecl = _typeReferenced.getDeclaration(StrCVQualifier + " " + qID);
-            //    break;
-            //}
+            strDecl = _typeReferenced.getDeclaration(StringHelper.glue(StrCVQualifier, qID));
             return strDecl;
         }
     }
@@ -366,11 +313,20 @@ namespace DeMangleVC
             }
             if (bEnclose)//bEncloseFuncName)
             {
-                sFuncBody = "(" + _strCallConversion + " " + qID + ")" + _strParamList + _strCVQThis;
+                if (qID.Length > 2 && qID[0] == '*' && qID[1] == ' ')
+                {
+                    qID = "*" + qID.Substring(2);
+                }
+                sFuncBody = "(" + _strCallConversion + qID + ")" + _strParamList + _strCVQThis;
             }
             else
             {
                 sFuncBody = _strCallConversion + " " + qID + _strParamList + _strCVQThis;
+            }
+
+            if (_strCVQThis != null && _strCVQThis != "")
+            {
+                sFuncBody += " ";
             }
 
             sFuncOut = _typeReturn.getDeclaration(sFuncBody + _strExceptionList);
@@ -378,246 +334,30 @@ namespace DeMangleVC
         }
     }
 
-    class TypeFunction : Type
-    {
-        private String _strModifier;
-
-        public String StrModifier
-        {
-            get { return _strModifier; }
-            set { _strModifier = value; }
-        }
-        private String _strThunkAdjustor;
-
-        public String StrThunkAdjustor
-        {
-            get { return _strThunkAdjustor; }
-            set { _strThunkAdjustor = value; }
-        }
-        private TypeFunctionBase _typeFunctionBase;
-
-        internal TypeFunctionBase TypeFunctionBase
-        {
-            get { return _typeFunctionBase; }
-            set { _typeFunctionBase = value; }
-        }
-
-    }
-
-
-
-    //class TypeID
+    //class TypeFunction : Type
     //{
-    //    String _strType;
-    //    public String strType
+    //    private String _strModifier;
+
+    //    public String StrModifier
     //    {
-    //        get { return _strType; }
+    //        get { return _strModifier; }
+    //        set { _strModifier = value; }
     //    }
-    //    int _iInsPos;
-    //    public int iInsPos
+    //    private String _strThunkAdjustor;
+
+    //    public String StrThunkAdjustor
     //    {
-    //        get { return _iInsPos; }
+    //        get { return _strThunkAdjustor; }
+    //        set { _strThunkAdjustor = value; }
     //    }
-    //    bool _bNeedBlank;
-    //    public bool bNeedBlank
+    //    private TypeFunctionBase _typeFunctionBase;
+
+    //    internal TypeFunctionBase TypeFunctionBase
     //    {
-    //        get { return _bNeedBlank; }
-    //    }
-    //    bool _bNeedBrackets;
-    //    public bool bNeedBrackets
-    //    {
-    //        get { return _bNeedBrackets; }
-    //    }
-    //    public TypeID()
-    //    {
-    //        _strType = "";
-    //        _iInsPos = 0;
-    //        _bNeedBlank = false;
+    //        get { return _typeFunctionBase; }
+    //        set { _typeFunctionBase = value; }
     //    }
 
-    //    protected virtual string toString()
-    //    {
-    //        return _strType;
-    //    }
-
-    //    public TypeID(String strType, int iInsPos, bool bNeedBlank, bool bNeedBrackets)
-    //    {
-    //        _strType = strType;
-    //        if (iInsPos < 0)
-    //        {
-    //            _iInsPos = strType.Length;
-    //        }
-    //        else
-    //        {
-    //            _iInsPos = iInsPos;
-    //        }
-    //        _bNeedBlank = bNeedBlank;
-    //        _bNeedBrackets = bNeedBrackets;
-    //    }
-
-    //    public TypeID Insert(TypeID typeID)
-    //    {
-    //        //TypeID TN = new TypeID(this);
-    //        if (_bNeedBlank && typeID.strType != "")
-    //        {
-    //            _strType = strType.Insert(iInsPos, " ");
-    //            _iInsPos++;
-    //        }
-    //        if (_bNeedBrackets)
-    //        {
-    //            _strType = strType.Insert(iInsPos, "(" + typeID.strType + ")");
-    //            _iInsPos += typeID.iInsPos + 1;
-    //        }
-    //        else
-    //        {
-    //            _strType = strType.Insert(iInsPos, typeID.strType);
-    //            _iInsPos += typeID.iInsPos;
-    //        }
-    //        _bNeedBlank = typeID._bNeedBlank;
-    //        _bNeedBrackets = typeID._bNeedBrackets;
-    //        return this;
-    //    }
-
-
-    //    public TypeID Insert(String strS, int iInsOffset, bool bNewNeedBlank, bool bNewNeedBrackets)
-    //    {
-    //        //TypeID TN = new TypeID(this);
-    //        if (iInsOffset < 0)
-    //        {
-    //            iInsOffset = strS.Length;
-    //        }
-    //        if (_bNeedBrackets && strS.Length != 0)
-    //        {
-    //            strS = "(" + strS + ")";
-    //            iInsOffset++;
-    //        }
-    //        if (_bNeedBlank && strS.Length != 0)
-    //        {
-    //            strS = " " + strS;
-    //            iInsOffset++;
-    //        }
-    //        _strType = _strType.Insert(_iInsPos, strS);
-    //        _iInsPos += iInsOffset;
-    //        _bNeedBlank = bNewNeedBlank;
-    //        _bNeedBrackets = bNewNeedBrackets;
-    //        return this;
-    //    }
-    //    public TypeID Insert(String strS, int iInsOffset, bool bNewNeedBlank)
-    //    {
-    //        return Insert(strS, iInsOffset, bNewNeedBlank, false);
-    //    }
-    //    public TypeID Insert(String strS, int iInsOffset)
-    //    {
-    //        return Insert(strS, iInsOffset, true);
-    //    }
-    //    public TypeID Insert(String strS)
-    //    {
-    //        return Insert(strS, -1);
-    //    }
-
-    //    public TypeID Append(String strS)
-    //    {
-    //        if (_strType != "" && strS != "")
-    //        {
-    //            strS = " " + strS;
-    //        }
-    //        if (_iInsPos == _strType.Length)
-    //        {
-    //            _iInsPos += strS.Length;
-    //            _bNeedBlank = true;
-    //        }
-    //        _strType = _strType + strS;
-    //        return this;
-    //    }
-
-    //    public TypeID InsertAtBegin(String prefix)
-    //    {
-    //        _iInsPos += prefix.Length;
-    //        _strType = prefix + _strType;
-    //        return this;
-    //    }
-
-    //    public void RemoveCVQualifier()
-    //    {
-    //        if (_strType.EndsWith(" volatile"))
-    //        {
-    //            _strType = _strType.Substring(0, _strType.Length - " volatile".Length);
-    //        }
-    //        if (_strType.EndsWith(" const"))
-    //        {
-    //            _strType = _strType.Substring(0, _strType.Length - " const".Length);
-    //        }
-    //        if (_iInsPos > _strType.Length)
-    //        {
-    //            _iInsPos = _strType.Length;
-    //        }
-    //    }
-    //}
-
-    //class CVQualifier
-    //{
-    //    private String _prefix;
-    //    private String _suffix;
-    //    public CVQualifier()
-    //    {
-    //        _prefix = "";
-    //        _suffix = "";
-    //    }
-    //    public String getPrefix()
-    //    {
-    //        return _prefix;
-    //    }
-    //    public String getSuffix()
-    //    {
-    //        return _suffix;
-    //    }
-    //    public void setPrefix(String pre)
-    //    {
-    //        _prefix = pre;
-    //    }
-    //    public void setSuffix(String suf)
-    //    {
-    //        _suffix = suf;
-    //    }
-    //    public String getCVQ()
-    //    {
-    //        if (_prefix != "" && _suffix != "")
-    //        {
-    //            return _prefix + " " + _suffix;
-    //        }
-    //        else
-    //        {
-    //            return _prefix + _suffix;
-    //        }
-    //    }
-    //    public bool isEmpty()
-    //    {
-    //        return _prefix == "" && _suffix == "";
-    //    }
-    //    public String makeID(String suffix)
-    //    {
-    //        if (suffix == "")
-    //        {
-    //            return getCVQ();
-    //        }
-    //        String ID=suffix;
-    //        if (_prefix != "")
-    //        {
-    //            ID = _prefix + " " + ID;
-    //        }
-    //        if (_suffix != "")
-    //        {
-    //            ID = ID + " " + _suffix;
-    //        }
-    //        return ID;
-    //    }
-    //    private string toString() { return ""; }
-
-    //    public void clear()
-    //    {
-    //        _suffix = "";
-    //        _prefix = "";
-    //    }
     //}
 
     class UnqualifiedID
@@ -1309,53 +1049,7 @@ namespace DeMangleVC
             iProcessPos++;
             return PList.ToString();
         }
-
-        /// <summary>
-        /// Get a template parameter, may be a type, reference, integer
-        /// </summary>
-        /// <returns></returns>
-        //private String GetTplPara()
-        //{
-        //    String retPara;
-        //    switch (src[iProcessPos])
-        //    {
-        //    case '$':// special template parameter, like reference, integer, etc.
-        //        iProcessPos++;
-        //        switch (src[iProcessPos])
-        //        {
-        //        case '0': // integer
-        //            iProcessPos++;
-        //            long val = GetInteger();
-        //            retPara = val.ToString();
-        //            break;
-        //        case '1': // pointer
-        //            QualifiedID qID;
-        //            TypeID vTypeID;
-        //            iProcessPos++;
-        //            if (src[iProcessPos] != '?')
-        //            {
-        //                throw (new Exception("\'?\' expected in reference template parameter"));
-        //            }
-        //            iProcessPos++;
-        //            qID = GetQualifiedID(true);
-        //            vTypeID = GetVaraibleType();
-        //            retPara = "&" + new Declarator(vTypeID, qID).strDeclarator;//vTypeID.Insert(qID).strType;
-        //            break;
-        //        case '$': // Simple ref, will use the letter C,
-        //            iProcessPos++;
-        //            retPara = GetSimpleRef(false).strType;//GetType(false, out iInsPosGet);
-        //            break;
-        //        default:
-        //            throw new Exception();
-        //        }
-        //        break;
-        //    default:
-        //        retPara = GetTypeLikeID(true).strType;
-        //        break;
-        //    }
-        //    return retPara;
-        //}
-
+        
         private long GetInteger()
         {
             bool minus = false;
@@ -1583,6 +1277,9 @@ namespace DeMangleVC
                 throw new Exception();
             }
             iProcessPos++;
+            if (tAccess != "" && sModifier != "") {
+                tAccess += " ";
+            }
             sModifier = sThunkPrefix + tAccess + sModifier;
             return sModifier;
         }
@@ -1734,7 +1431,7 @@ namespace DeMangleVC
             {
             case 'T':case 'U':case 'V':case 'W':
                 iProcessPos++;
-                sType.ClassKey = strType[cType - 'A'] + " " + infixEnum;
+                sType.ClassKey = StringHelper.glue(strType[cType - 'A'], infixEnum);
                 sType.StrClassQualifiedName = GetQualifiedID(true).strQualifiedID;
                 //sType = new TypeID(strType[cType - 'A'] + " " + infixEnum + GetQualifiedID(true).strQualifiedID, -1, true, false);
                 if (bPush)
@@ -1951,20 +1648,20 @@ namespace DeMangleVC
             String CVQ = "";
             //bFunc = false;
             bMemThis = false;
-           switch (src[iProcessPos])
+            switch (src[iProcessPos])
             {
             case '6':
-          CVQ = "";
+                CVQ = "";
                 break;
-          case '8':
-                            iProcessPos++;
+            case '8':
+                iProcessPos++;
                 CVQ = GetNestedNameSpecifier().strNestNameSpecifier;
                 bMemThis = true;
                 iProcessPos--;
                 break;
             default:
-                throw new Exception("Unrecognized CV-Q = ifier " + new String(src[iProcessPos], 1));
-           }
+                throw new Exception("Unrecognized CV-Qualifier " + new String(src[iProcessPos], 1));
+            }
             iProcessPos++;
             return CVQ;
         }

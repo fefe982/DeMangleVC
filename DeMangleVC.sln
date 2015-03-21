@@ -6,10 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CDEB645B-D0F9-4A46-8CFD-10EEEF2E4D1C}"
 	ProjectSection(SolutionItems) = preProject
 		CFG.TXT = CFG.TXT
-		data\error.txt = data\error.txt
-		data\input.txt = data\input.txt
 		memo.txt = memo.txt
-		data\test_suit.txt = data\test_suit.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeMangleVC", "DeMangleVC.csproj", "{A33656F3-142A-4916-804D-17F9B76B5B04}"
