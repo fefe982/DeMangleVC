@@ -136,8 +136,15 @@ namespace DeMangleVC
                     qID = qID.Substring(_strReferenceType.Length - 1);
                 }
             }
-            strDecl = _typeReferenced.getDeclaration(StringHelper.glue(StrCVQualifier, StringHelper.glue(_strReferenceType, qID)), true);
-            return strDecl;
+            if (StrCVQualifier.EndsWith("::"))
+            {
+                strDecl = StrCVQualifier + StringHelper.glue(_strReferenceType, qID);
+            }
+            else
+            {
+                strDecl = StringHelper.glue(StrCVQualifier, StringHelper.glue(_strReferenceType, qID));
+            }
+            return _typeReferenced.getDeclaration(strDecl, true);
         }
         public override void ajdustCVQ()
         {
@@ -259,7 +266,7 @@ namespace DeMangleVC
         }
         public override string getDeclaration(string qID, bool hasBrackt = false)
         {
-            return _strAccess + _type.getDeclaration(StrCVQualifier + " " + qID);
+            return _strAccess + _type.getDeclaration(StringHelper.glue(StrCVQualifier, qID));
         }
     }
 
@@ -319,7 +326,11 @@ namespace DeMangleVC
                 {
                     qID = "*" + qID.Substring(2);
                 }
-                sFuncBody = "(" + _strCallConversion + qID + ")" + _strParamList + _strCVQThis;
+#if REFINE__
+                sFuncBody = "(" + StringHelper.glue(_strCallConversion, qID) + ")" + _strParamList + _strCVQThis;
+#else
+                sFuncBody = "(" + _strCallConversion + (qID.StartsWith("*") ? "" : " ") + qID + ")" + _strParamList + _strCVQThis;
+#endif
             }
             else
             {
@@ -338,32 +349,6 @@ namespace DeMangleVC
             return sFuncOut;
         }
     }
-
-    //class TypeFunction : Type
-    //{
-    //    private String _strModifier;
-
-    //    public String StrModifier
-    //    {
-    //        get { return _strModifier; }
-    //        set { _strModifier = value; }
-    //    }
-    //    private String _strThunkAdjustor;
-
-    //    public String StrThunkAdjustor
-    //    {
-    //        get { return _strThunkAdjustor; }
-    //        set { _strThunkAdjustor = value; }
-    //    }
-    //    private TypeFunctionBase _typeFunctionBase;
-
-    //    internal TypeFunctionBase TypeFunctionBase
-    //    {
-    //        get { return _typeFunctionBase; }
-    //        set { _typeFunctionBase = value; }
-    //    }
-
-    //}
 
     class UnqualifiedID
     {
@@ -828,7 +813,7 @@ namespace DeMangleVC
                         {
                             throw new Exception();
                         }
-                        sIdent = "[thunk]: __thiscall " + qID.strQualifiedID + "{" + val.ToString() + ",{flat}}\'";
+                        sIdent = "[thunk]: __thiscall " + qID.strQualifiedID + "{" + val.ToString() + ",{flat}}' }'";
                     }
                     else
                     {
@@ -1580,13 +1565,6 @@ namespace DeMangleVC
         private TypeFunctionBase GetFunctionBody(bool bHasThis)
         {
             TypeFunctionBase retType = new TypeFunctionBase();
-            //String sCallConv = "";
-            //Type sRetType;
-            //String sParmList = "";
-            //String sFuncBody = "";
-            //String sFuncOut = "";
-            //String sCVQThis = "";
-            //String sThrowParamList = "";
 
             if (bHasThis)
             {
