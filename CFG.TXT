@@ -41,10 +41,11 @@ TplParaList :=
     TplPara TplParaList
 
 TplPara :=
+	'$$V'   // empty parameter expansion (type)
+	'$S'    // empty parameter expansion (size_t)
     Type
     IntTplPara
     RefTplPara
-    CVQTplPara
 
 IntTplPara :=
     '$0' IntConst
@@ -57,9 +58,6 @@ IntConst :=
 
 RefTplPara :=
     '$?' QualifiedName VariableType
-
-CVQTplPara :=
-    '$$' 'C' CVQ Type
 
 VariableType :=
     VarAccMod Type VarCVQ
@@ -94,6 +92,8 @@ RefSpLt :=
     Q   // * const
     R   // * volatile
     S   // * const volatile
+	$$C //
+	$$Q // &&
 
 CompoundType :=
     CompoundSpLt QualifiedName

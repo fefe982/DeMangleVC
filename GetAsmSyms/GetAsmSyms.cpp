@@ -2,9 +2,9 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
+#include <map>
 
-std::regex regexPROC("(\\?[^ \\t]+) PROC");
-std::regex regexVAR("(\\?[^ \\t]+) D");
+std::regex regexSymbol("(\\?[^ \\t]+) .*(?:; (.+))?$");
 
 int main(int argc, char **argv)
 {
@@ -15,17 +15,25 @@ int main(int argc, char **argv)
         if (isAsm)
         {
             std::string line;
+            std::map<std::string, std::string> sym_map;
             while (std::getline(isAsm, line))
             {
                 std::smatch sm;
-                if (std::regex_search(line, sm, regexPROC, std::regex_constants::match_continuous))
+                if (std::regex_search(line, sm, regexSymbol, std::regex_constants::match_continuous))
                 {
-                    std::cout << sm[1] << std::endl;
+                    if (sm.size() == 3)
+                    {
+                        sym_map[sm[1]] = sm[2];
+                    }
+                    else
+                    {
+                        sym_map[sm[1]];
+                    }
                 }
-                else if (std::regex_search(line, sm, regexVAR, std::regex_constants::match_continuous))
-                {
-                    std::cout << sm[1] << std::endl;
-                }
+            }
+            for (auto const & p : sym_map)
+            {
+                std::cout << p.first << " " << p.second << "\n";
             }
         }
     }
