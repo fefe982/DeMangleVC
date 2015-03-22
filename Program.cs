@@ -78,6 +78,7 @@ namespace DeMangleVC
         {
             return StringHelper.glue(getTypeString(), qID);
         }
+        virtual public void ajdustCVQ() { _strCVQualifier = ""; }
     }
 
     class TypeSimple : Type
@@ -138,16 +139,13 @@ namespace DeMangleVC
             strDecl = _typeReferenced.getDeclaration(StringHelper.glue(StrCVQualifier, StringHelper.glue(_strReferenceType, qID)), true);
             return strDecl;
         }
+        public override void ajdustCVQ()
+        {
+            _strReferenceType = _strReferenceType.Replace("* const", "*");
+        }
     }
     class TypeSimpleRef : Type
     {
-        //private String _strReferenceType;
-
-        //public String StrReferenceType
-        //{
-        //    get { return _strReferenceType; }
-        //    set { _strReferenceType = value; }
-        //}
         private Type _typeReferenced;
 
         internal Type TypeReferenced
@@ -165,10 +163,14 @@ namespace DeMangleVC
         }
         public override string getDeclaration(string qID, bool hasBrackt = false)
         {
-            String strDecl = "";
-            strDecl = _typeReferenced.getDeclaration(StringHelper.glue(StrCVQualifier, qID));
-            return strDecl;
+#if REFINE__
+            // UndecorateSymbolName will add an extra blank after construct like "class XXX cost ", wich is ussually not needed
+            return _typeReferenced.getDeclaration(StringHelper.glue(StrCVQualifier, qID));
+#else
+            return _typeReferenced.getDeclaration(StrCVQualifier != "" ? StrCVQualifier + " " + qID : qID);
+#endif
         }
+        public override void ajdustCVQ() { }
     }
     class TypeClass : Type
     {
@@ -323,12 +325,15 @@ namespace DeMangleVC
             {
                 sFuncBody = _strCallConversion + " " + qID + _strParamList + _strCVQThis;
             }
-
+#if REFINE__
+            // UnDecorateSymboleName will add an extra blank at the end of const member function, which is not needed
+#else
             if (_strCVQThis != null && _strCVQThis != "")
             {
                 sFuncBody += " ";
             }
-
+#endif
+            _typeReturn.ajdustCVQ();
             sFuncOut = _typeReturn.getDeclaration(sFuncBody + _strExceptionList);
             return sFuncOut;
         }
@@ -409,11 +414,15 @@ namespace DeMangleVC
             {
                 insertionPoint = idt.strUnqualifiedID.IndexOf(" $B#");
             }
+#if REFINE__
+            // UnDecorateSymboleName will not put a blank between operator?? and the following template parameter list,
+            // causing confusion. e.g operator<<...> This piece of code adds an extra blank
             char chEnd = idt._strUnqualifiedID[insertionPoint - 1];
             if (!Char.IsLetterOrDigit(chEnd) && chEnd != '_' && chEnd != '#')//# is used in operator replacement
             {   // add blanks for operators, like operator< , etc.
                 TplParaList = " " + TplParaList;
             }
+#endif
             idt._strUnqualifiedID = idt._strUnqualifiedID.Insert(insertionPoint, TplParaList);
             switch (idt._eUnqualifiedIdType)
             {
@@ -1592,7 +1601,6 @@ namespace DeMangleVC
             }
             retType.StrCallConversion = GetCallConv();
             retType.TypeReturn = GetReturnType();
-
             retType.StrParamList = "(" + GetParameterDeclarationClause() + ")";
             retType.StrExceptionList = GetParameterDeclarationClause();
 
