@@ -65,7 +65,7 @@ namespace DeMangleVC
     };
     class Type
     {
-        private String _strCVQualifier;
+        private String _strCVQualifier = "";
 
         public String StrCVQualifier
         {
@@ -286,7 +286,7 @@ namespace DeMangleVC
             get { return _strParamList; }
             set { _strParamList = value; }
         }
-        private String _strCVQThis;
+        private String _strCVQThis = "";
 
         public String StrCVQThis
         {
@@ -322,13 +322,17 @@ namespace DeMangleVC
             }
             if (bEnclose)//bEncloseFuncName)
             {
-                if (qID.Length > 2 && qID[0] == '*' && qID[1] == ' ')
-                {
-                    qID = "*" + qID.Substring(2);
-                }
 #if REFINE__
                 sFuncBody = "(" + StringHelper.glue(_strCallConversion, qID) + ")" + _strParamList + _strCVQThis;
 #else
+                if (qID.StartsWith("* *") ||
+                    qID.StartsWith("* __stdcall ") ||
+                    qID.StartsWith("* __cdecl ") ||
+                    qID.StartsWith("* __clrcall ") ||
+                    qID.StartsWith("* __thiscall "))
+                {
+                    qID = "*" + qID.Substring(2);
+                }
                 sFuncBody = "(" + _strCallConversion + (qID.StartsWith("*") ? "" : " ") + qID + ")" + _strParamList + _strCVQThis;
 #endif
             }
@@ -339,7 +343,7 @@ namespace DeMangleVC
 #if REFINE__
             // UnDecorateSymboleName will add an extra blank at the end of const member function, which is not needed
 #else
-            if (_strCVQThis != null && _strCVQThis != "")
+            if (_strCVQThis != "")
             {
                 sFuncBody += " ";
             }
@@ -929,7 +933,7 @@ namespace DeMangleVC
                     case '0':
                         iProcessPos++;
                         Type strClassType = GetTypeLikeID(false);
-                        strOperatorID = strClassType.getDeclaration("") + "`RTTI Type Descriptor\'";
+                        strOperatorID = strClassType.getDeclaration("") + " `RTTI Type Descriptor'";
                         break;
                     case '1':
                         int[] iNum = new int[4];
