@@ -253,6 +253,14 @@ namespace DeMangleVC
             //String Decl = "";
             if (qID.IndexOf('*') >= 0 || qID.IndexOf('&') >= 0)
             {
+#if REFINE__
+#else
+                // This should be a bug of UnDecorateSymbolName
+                if (qID.StartsWith("* const "))
+                {
+                    qID = "*" + qID.Substring("* const".Length);
+                }
+#endif
                 qID = "(" + qID + ")";
             }
             return _baseType.getDeclaration(qID + _strSubcript);
@@ -1642,6 +1650,11 @@ namespace DeMangleVC
                 CVQ = "const volatile";
                 bOver = true;
                 break;
+            case 'E':
+                iProcessPos++;
+                CVQ = "__ptr64";
+                bOver = true;
+                break;
             case 'Q':
                 iProcessPos++;
                 CVQ = GetNestedNameSpecifier().strNestNameSpecifier;
@@ -1768,13 +1781,7 @@ namespace DeMangleVC
 
             if (iSpecialVariable != 9 && iSpecialVariable != 8 && iSpecialVariable != 5)
             {
-                if (src[iProcessPos]=='E')
-                {
-                //    strCVMod.setSuffix("__ptr64");
-                    iProcessPos++;
-                }
                 retType.StrCVQualifier = GetCVQVar();
-                //strCVMod.setPrefix(GetCVQVar().getPrefix());
             }
 
             if (iSpecialVariable == 5)
@@ -1784,13 +1791,6 @@ namespace DeMangleVC
             }
 
             retType.InnerType = BaseType;
-            //if (retType.strType.EndsWith(" " + strCVMod.getCVQ()))
-            //{
-            //    stTypeSimplear();
-            //}
-            //retType.Insert(strCVMod.getCVQ()).InsertAtBegin(strAccess);
-             //eturn new TypeID(strAccess + BaseType.strType + strCVM            //{
-            //      h + strAccess            //}
             return retType;
         }
     }
