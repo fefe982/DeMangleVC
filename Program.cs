@@ -789,9 +789,7 @@ namespace DeMangleVC
             }
             else if(Char.IsLetter(src[iProcessPos])) // function
             {
-                //String sCallConvertion;
                 String sModifier;
-                //String sCVQthis;
                 bool bHasThis;
                 String sThunkAdjustor;
                 sModifier = getFunctionModifier(out bHasThis, out sThunkAdjustor);
@@ -799,19 +797,29 @@ namespace DeMangleVC
                 {
                     sModifier = sModifier + " ";
                 }
-                //qID = qID + sThunkAdjustor;
-                //int iInsPos;
                 String sFuncBody = GetFunctionBody(bHasThis).getDeclaration(qID.strQualifiedID + sThunkAdjustor);
-
                 sIdent = sModifier + sFuncBody;
             }
             else
             {
                 if (src[iProcessPos] == '$')
                 {   // currently we only meet this in vcall
+                    long val;
                     iProcessPos++;
-                    if (src[iProcessPos] == 'A')
+                    switch (src[iProcessPos])
                     {
+                    case '4':
+                        {   // [thunk], `vector deleting destructor'
+                            iProcessPos++;
+                            long val1 = GetInteger();
+                            long val2 = GetInteger();
+                            String sModifier = "[thunk]:public: virtual ";
+                            TypeFunctionBase func = GetFunctionBody(true);
+                            String sFuncBody = func.getDeclaration(qID.strQualifiedID + "`vtordisp{" + val1 + "," + val2 + "}' ");
+                            sIdent = sModifier + sFuncBody;
+                            break;
+                        }
+                    case 'A':
                         iProcessPos++;
                         Type sRetType = GetReturnType();
                         if(src[iProcessPos] != 'A')
@@ -820,19 +828,17 @@ namespace DeMangleVC
                         }
                         //sIdent = "[thunk]:" + sRetType.Insert(qID.strQualifiedID + "`local static destructor helper\'", -1, true).strType;
                         sIdent = "[thunk]:" + sRetType.getDeclaration(qID.strQualifiedID + "`local static destructor helper\'");
-                    }
-                    else if (src[iProcessPos] == 'B')
-                    {
+                        break;
+                    case 'B':
                         iProcessPos++;
-                        long val = GetInteger();
+                        val = GetInteger();
                         if (src.Substring(iProcessPos, 2) != "AE")
                         {
                             throw new Exception();
                         }
                         sIdent = "[thunk]: __thiscall " + qID.strQualifiedID + "{" + val.ToString() + ",{flat}}' }'";
-                    }
-                    else
-                    {
+                        break;
+                    default:
                         throw new Exception();
                     }
                 }
@@ -1277,11 +1283,6 @@ namespace DeMangleVC
             case 'G':case 'O':case 'W':
                 iProcessPos++;
                 long lAdjustor = GetInteger();
-                //if (lAdjustor > 0x7fffffff)
-                //{
-                //    lAdjustor = -((lAdjustor ^ 0xffffffff) + 1);
-                //}
-                //tAccess = "[thunk]:" + tAccess;
                 sThunkPrefix = "[thunk]:";
                 sThunkAdjustor = "`adjustor{" + lAdjustor.ToString() + "}\' ";
                 sModifier = strModifier[(int)enumModifier.enmMvirtual];
