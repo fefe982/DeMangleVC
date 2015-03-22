@@ -997,25 +997,32 @@ namespace DeMangleVC
                     if (src[iProcessPos] == 'E')
                     {
                         iProcessPos++;
-                        String Decl = GetIdentifier().strUnqualifiedID;
-                        iProcessPos--;
+                        String Decl = "";
+                        if (src[iProcessPos] == '?')
+                        {
+                            Decl = GetDeclaration();
+                        }
+                        else
+                        {
+                            Decl = GetIdentifier().strUnqualifiedID;
+                            iProcessPos--;
+                        }
                         strOperatorID = "`dynamic initializer for '" + Decl + "''";
                     }
                     else if (src[iProcessPos] == 'F')
                     {
                         iProcessPos++;
+                        String Decl = "";
                         if (src[iProcessPos] == '?')
                         {
-                            String Decl = GetIdentifier().strUnqualifiedID;
-                            iProcessPos--;
-                            strOperatorID = "`dynamic atexit destructor for '" + Decl + "''";
+                            Decl = GetDeclaration();
                         }
                         else
                         {
-                            UnqualifiedID uidName = GetClassNamespaceName();
-                            strOperatorID = "`dynamic atexit destructor for '" + uidName.strUnqualifiedID + "''";
-                            iProcessPos--; 
+                            Decl = GetIdentifier().strUnqualifiedID;
+                            iProcessPos--;
                         }
+                        strOperatorID = "`dynamic atexit destructor for '" + Decl + "''";
                     }
                     else if (src[iProcessPos] >= 'A' && src[iProcessPos] <= 'Z')
                     {
