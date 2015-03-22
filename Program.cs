@@ -61,7 +61,8 @@ namespace DeMangleVC
         enmFunctionBase,
         enmNamedVar,
         enmFunction,
-        enmVarType
+        enmVarType,
+        enmSpecialSuffix // some special non-var 'non type'
     };
     class Type
     {
@@ -88,7 +89,7 @@ namespace DeMangleVC
         {
             _strType = type;
         }
-        override public String getTypeString()
+        public override String getTypeString()
         {
             return _strType;
         }
@@ -99,6 +100,24 @@ namespace DeMangleVC
         public override string getDeclaration(string qID, bool hasBrackt = false)
         {
             return StringHelper.glue(_strType, qID);
+        }
+    }
+
+    class TypeSpecial : Type
+    {
+        private String _strSuffix;
+        public String strSuffix
+        {
+            get { return _strSuffix; }
+            set { _strSuffix = value; }
+        }
+        public TypeSpecial(string suffix)
+        {
+            _strSuffix = suffix;
+        }
+        public override string getDeclaration(string qID, bool bEnclose = false)
+        {
+            return qID + _strSuffix;
         }
     }
 
@@ -326,6 +345,7 @@ namespace DeMangleVC
                 sFuncBody = "(" + StringHelper.glue(_strCallConversion, qID) + ")" + _strParamList + _strCVQThis;
 #else
                 if (qID.StartsWith("* *") ||
+                    qID.StartsWith("* &") ||
                     qID.StartsWith("* __stdcall ") ||
                     qID.StartsWith("* __cdecl ") ||
                     qID.StartsWith("* __clrcall ") ||
@@ -1760,7 +1780,7 @@ namespace DeMangleVC
             if (iSpecialVariable == 5)
             {
                 long l = GetInteger();
-                BaseType = new TypeSimple("{" + l + "}'");///, 0, false, false);
+                BaseType = new TypeSpecial("{" + l + "}'");///, 0, false, false);
             }
 
             retType.InnerType = BaseType;
