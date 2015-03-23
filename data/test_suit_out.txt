@@ -1,0 +1,2 @@
+char (* `main'::`2'::c)[10]
+char const (* `main'::`2'::d)[10]
