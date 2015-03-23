@@ -174,7 +174,7 @@ namespace DeMangleVC
                 }
 #endif
             }
-            return _typeReferenced.getDeclaration(strDecl, true);
+            return _typeReferenced.getDeclaration(strDecl, (_typeReferenced is TypeFunctionBase && _strReferenceType == "") ? false : true);
         }
         public override void ajdustCVQ()
         {
@@ -350,7 +350,7 @@ namespace DeMangleVC
             }
             else
             {
-                sFuncBody = _strCallConversion + " " + qID + _strParamList + _strCVQThis;
+                sFuncBody = StringHelper.glue(_strCallConversion, qID) + _strParamList + _strCVQThis;
             }
 #if REFINE__
             // UnDecorateSymboleName will add an extra blank at the end of const member function, which is not needed
@@ -787,7 +787,7 @@ namespace DeMangleVC
                     sIdent = sIdent + "{for `" + forDst + "'}";
                 }
             }
-            else if(Char.IsLetter(src[iProcessPos])) // function
+            else if (Char.IsLetter(src[iProcessPos])) // function
             {
                 String sModifier;
                 bool bHasThis;
@@ -822,7 +822,7 @@ namespace DeMangleVC
                     case 'A':
                         iProcessPos++;
                         Type sRetType = GetReturnType();
-                        if(src[iProcessPos] != 'A')
+                        if (src[iProcessPos] != 'A')
                         {
                             throw new Exception();
                         }
@@ -1080,7 +1080,7 @@ namespace DeMangleVC
             iProcessPos++;
             return PList.ToString();
         }
-        
+
         private long GetInteger()
         {
             bool minus = false;
@@ -1136,7 +1136,7 @@ namespace DeMangleVC
                 uIDBaseID.ReplaceCtorDtor(uIDFisrtQualifier);
             }
 
-            return new QualifiedID(nnsQualifier , uIDBaseID);
+            return new QualifiedID(nnsQualifier, uIDBaseID);
         }
 
         /// <summary>
@@ -1171,7 +1171,7 @@ namespace DeMangleVC
         private UnqualifiedID GetClassNamespaceName()
         {
             UnqualifiedID uID;
-            switch(src[iProcessPos])
+            switch (src[iProcessPos])
             {
             case '?':
                 iProcessPos++;
@@ -1207,7 +1207,7 @@ namespace DeMangleVC
 
         private UnqualifiedID GetAnonymousNameSpace()
         {
-            if(src.Substring(iProcessPos,3) != "A0x")
+            if (src.Substring(iProcessPos, 3) != "A0x")
             {
                 throw new Exception("illegal anonymous namespace");
             }
@@ -1215,18 +1215,18 @@ namespace DeMangleVC
             for (int i = 0; i < 8; i++)
             {
                 char chr = src[iProcessPos];
-                if(!((chr >='0' && chr <= '9') ||
-                    (chr >='a' && chr <= 'f')))
+                if (!((chr >= '0' && chr <= '9') ||
+                    (chr >= 'a' && chr <= 'f')))
                 {
                     throw new Exception("illegal anonymous namespace");
                 }
-                iProcessPos ++;
+                iProcessPos++;
             }
-            if(src[iProcessPos] != '@')
+            if (src[iProcessPos] != '@')
             {
                 throw new Exception("illegal anonymous namespace");
             }
-            iProcessPos ++;
+            iProcessPos++;
             String StrAnonymousNamespace = "`anonymous namespace\'";
             UnqualifiedID uIDAnonymousNamespace = new UnqualifiedID(StrAnonymousNamespace, UnqualifiedID.enumUnqualifiedID.enmIdentifier);
             vUiD.Peek().Add(uIDAnonymousNamespace);
@@ -1252,7 +1252,7 @@ namespace DeMangleVC
                 retID = new UnqualifiedID(src.Substring(iProcessPos, i), UnqualifiedID.enumUnqualifiedID.enmIdentifier);
                 //if (Push)
                 //{
-                    vUiD.Peek().Add(retID);
+                vUiD.Peek().Add(retID);
                 //}
                 //vBackRef.Peek().Add(retStr);
                 if (i != 0)
@@ -1303,7 +1303,8 @@ namespace DeMangleVC
                 throw new Exception();
             }
             iProcessPos++;
-            if (tAccess != "" && sModifier != "") {
+            if (tAccess != "" && sModifier != "")
+            {
                 tAccess += " ";
             }
             sModifier = sThunkPrefix + tAccess + sModifier;
@@ -1422,7 +1423,7 @@ namespace DeMangleVC
                     break;
                 case '$': // Simple ref, will use the letter C,
                     iProcessPos++;
-                    if (src[iProcessPos] == '$' && src[iProcessPos+1] == 'V')
+                    if (src[iProcessPos] == '$' && src[iProcessPos + 1] == 'V')
                     {   // "$$$V@" for empty template parameter list
                         retType = new TypeSimple("");
                         iProcessPos += 2;
@@ -1465,9 +1466,12 @@ namespace DeMangleVC
                     throw new Exception("illegal Enumeration : " + src[iProcessPos]);
                 }
             }
-            switch(cType)
+            switch (cType)
             {
-            case 'T':case 'U':case 'V':case 'W':
+            case 'T':
+            case 'U':
+            case 'V':
+            case 'W':
                 iProcessPos++;
                 sType.ClassKey = StringHelper.glue(strType[cType - 'A'], infixEnum);
                 sType.StrClassQualifiedName = GetQualifiedID(true).strQualifiedID;
@@ -1490,24 +1494,31 @@ namespace DeMangleVC
 
             switch (src[iProcessPos])
             {
+            case 'A': // function pointers
+                iProcessPos++;
+                bool bHasThis;
+                sType.StrCVQualifier = GetCVQFunc(out bHasThis);
+                sType.TypeReferenced = GetFunctionBody(bHasThis);
+                break;
             case 'B': // in parameter, array, no CV qualifier
                 iProcessPos++;
+                sType.TypeReferenced = GetTypeLikeID(false);
                 break;
             case 'C': // in template paramter list
             case '?': // type transfered by value
                 iProcessPos++;
-                CVQ = GetCVQVar();
+                sType.StrCVQualifier = GetCVQVar();
+                sType.TypeReferenced = GetTypeLikeID(false);
                 break;
             case 'Q':
                 iProcessPos++;
                 sType.StrReferenceType = "&&";
-                CVQ = GetCVQVar();
+                sType.StrCVQualifier = GetCVQVar();
+                sType.TypeReferenced = GetTypeLikeID(false);
                 break;
             default:
-                throw new Exception("illegal Simple Ref : " + src[iProcessPos]);
+                throw new Exception("illegal Special Ref : " + src[iProcessPos]);
             }
-            sType.TypeReferenced = GetTypeLikeID(false);
-            sType.StrCVQualifier = CVQ;
             if (bPush)
             {
                 vType.Peek().Add(sType);
@@ -1546,7 +1557,6 @@ namespace DeMangleVC
             {
                 sType.StrCVQualifier = GetCVQFunc(out bHasThis);
                 sType.TypeReferenced = GetFunctionBody(bHasThis);
-                //                sType = subType;
             }
             else
             {
@@ -1586,7 +1596,7 @@ namespace DeMangleVC
                 retType.StrSubcript = retType.StrSubcript + "[" + GetInteger() + "]";
             }
             retType.BaseType = GetTypeLikeID(false);
-            
+
 
             //Type = subType.Insert(sub, 0, false, true);
             //if (bPush)
@@ -1680,7 +1690,7 @@ namespace DeMangleVC
             default:
                 throw new Exception("Unrecognized CV-Qualifier " + src[iProcessPos]);
             }
-            
+
             return CVQ;
         }
         private String GetCVQFunc(out bool bMemThis)
@@ -1787,7 +1797,7 @@ namespace DeMangleVC
                 break;
             default:
                 throw new Exception("Illegal Variable Acess modifier: " + src[iProcessPos]);
-                //break;
+            //break;
             }
             iProcessPos++;
 

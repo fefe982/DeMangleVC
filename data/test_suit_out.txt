@@ -1,2 +1,5 @@
+public: __thiscall std::function<void (__cdecl )(void)>::function<void (__cdecl )(void)><class <lambda_b017edad6ca290e88c4fa7f7ed50313f> >(class <lambda_b017edad6ca290e88c4fa7f7ed50313f> &&)
+class AAA<> aa
+class BBB<> bb
 char (* `main'::`2'::c)[10]
 char const (* `main'::`2'::d)[10]
