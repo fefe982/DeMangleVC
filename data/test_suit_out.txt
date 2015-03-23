@@ -1,3 +1,4 @@
+public: static int const std::numeric_limits<long double>::digits10
 public: __thiscall std::function<void (__cdecl )(void)>::function<void (__cdecl )(void)><class <lambda_b017edad6ca290e88c4fa7f7ed50313f> >(class <lambda_b017edad6ca290e88c4fa7f7ed50313f> &&)
 class AAA<> aa
 class BBB<> bb

@@ -1353,7 +1353,7 @@ namespace DeMangleVC
             switch (src[iProcessPos])
             {
             case 'C':case 'D':case 'E':case 'F':case 'G':case 'H':
-            case 'I':case 'J':case 'K':case 'M':case 'N':case 'X':
+            case 'I':case 'J':case 'K':case 'M':case 'N':case 'O':case 'X':
                 retType = new TypeSimple(strType[src[iProcessPos] - 'A']);
                 iProcessPos++;
                 break;
