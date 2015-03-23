@@ -17,7 +17,11 @@ The project with refine will insert a blank: `operator< <int>(...)`.
 Also, there are a lot of symbols that `UndecorateSymbolName` cannot handle.
 The <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms679294%28v=vs.85%29.aspx">latest `dbghelp`</a> is from 2010, so you know why.
 
-The project now wors with VS2013. You can get a community version for free.
+The project now works with VS2013. You can get a community version for free.
+
+Feedback is welcome!! You can provide me with any symbol that cannot be handled by this program.
+It will be very helpful if you can also provide the (partial) undecorated version (in case `UndecorateSymbolName` cannot handle it either),
+or the program that can generate such a symbol.
 
 ## Introduction to the sub-projects
 ### DeMangleVC

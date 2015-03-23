@@ -1,3 +1,4 @@
+??_8?$basic_fstream@DU?$char_traits@D@std@@@std@@7B?$basic_istream@DU?$char_traits@D@std@@@1@@
 ?digits10@?$numeric_limits@O@std@@2HB std::numeric_limits<long double>::digits10
 ??$?0V<lambda_b017edad6ca290e88c4fa7f7ed50313f>@@@?$function@$$A6AXXZ@std@@QAE@$$QAV<lambda_b017edad6ca290e88c4fa7f7ed50313f>@@@Z
 ?aa@@3V?$AAA@$S@@A aa

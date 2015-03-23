@@ -17,19 +17,19 @@ namespace DeMangleVC
                 while (line != null)
                 {
                     DeMangel dm = new DeMangel(line);
-                    //try
+                    try
                     {
                         dm.Work();
                     }
-                    //catch (Exception e)
-                    //{
-                    //    Console.Error.WriteLine(line);
-                    //    Console.Error.WriteLine(dm.processPos);
-                    //    Console.Error.WriteLine(e.Data);
-                    //    Console.Error.WriteLine(e.Message);
-                    //    Console.Error.WriteLine(e.Source);
-                    //    Console.Error.WriteLine(e.StackTrace);
-                    //}
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine(line);
+                        Console.Error.WriteLine(dm.processPos);
+                        Console.Error.WriteLine(e.Data);
+                        Console.Error.WriteLine(e.Message);
+                        Console.Error.WriteLine(e.Source);
+                        Console.Error.WriteLine(e.StackTrace);
+                    }
                     String res = dm.GetResult();
                     Console.WriteLine(res);
                     line = sr.ReadLine();
@@ -748,7 +748,7 @@ namespace DeMangleVC
         public DeMangel(String source)
         {
             src = source;
-            dst = "";
+            dst = source;
             vType = new Stack<List<Type>>();
             vType.Push(new List<Type>());
             vUiD = new Stack<List<UnqualifiedID>>();
@@ -777,7 +777,7 @@ namespace DeMangleVC
             {
                 TypeVarType sType = GetVaraibleType();
                 String forDst = "";
-                if (src.Substring(iProcessPos - 2, 2) == "6B")
+                if (iProcessPos < src.Length && src[iProcessPos] == '?')
                 {
                     forDst = GetQualifiedID(true).strQualifiedID;
                 }
@@ -1489,7 +1489,6 @@ namespace DeMangleVC
 
         private TypeReference GetSpecialRef(bool bPush)
         {
-            String CVQ = "";
             TypeReference sType = new TypeReference();
 
             switch (src[iProcessPos])
@@ -1654,38 +1653,31 @@ namespace DeMangleVC
         private String GetCVQVar()
         {
             String CVQ;
-            bool bOver;
             switch (src[iProcessPos])
             {
             case 'A':
                 iProcessPos++;
                 CVQ = "";
-                bOver = true;
                 break;
             case 'B':
                 iProcessPos++;
                 CVQ = "const";
-                bOver = true;
                 break;
             case 'C':
                 iProcessPos++;
                 CVQ = "volatile";
-                bOver = true;
                 break;
             case 'D':
                 iProcessPos++;
                 CVQ = "const volatile";
-                bOver = true;
                 break;
             case 'E':
                 iProcessPos++;
                 CVQ = "__ptr64";
-                bOver = true;
                 break;
             case 'Q':
                 iProcessPos++;
                 CVQ = GetNestedNameSpecifier().strNestNameSpecifier;
-                bOver = true;
                 break;
             default:
                 throw new Exception("Unrecognized CV-Qualifier " + src[iProcessPos]);

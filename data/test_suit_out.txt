@@ -1,6 +1,7 @@
+const std::basic_fstream<char,struct std::char_traits<char> >::`vbtable'{for `std::basic_istream<char,struct std::char_traits<char> >'}
 public: static int const std::numeric_limits<long double>::digits10
-public: __thiscall std::function<void (__cdecl )(void)>::function<void (__cdecl )(void)><class <lambda_b017edad6ca290e88c4fa7f7ed50313f> >(class <lambda_b017edad6ca290e88c4fa7f7ed50313f> &&)
+public: __thiscall std::function<void __cdecl(void)>::function<void __cdecl(void)><class <lambda_b017edad6ca290e88c4fa7f7ed50313f> >(class <lambda_b017edad6ca290e88c4fa7f7ed50313f> &&)
 class AAA<> aa
 class BBB<> bb
 char (* `main'::`2'::c)[10]
-char const (* `main'::`2'::d)[10]
+char const (* const `main'::`2'::d)[10]
