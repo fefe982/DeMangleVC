@@ -14,8 +14,14 @@ namespace DeMangleVC
                 StreamReader sr = new StreamReader(args[0]);
                 String line;
                 line = sr.ReadLine();
+                char [] sep = {' ', '\t'};
                 while (line != null)
                 {
+                    int idx = line.IndexOfAny(sep);
+                    if (idx > 0)
+                    {
+                        line = line.Substring(0, idx);
+                    }
                     DeMangel dm = new DeMangel(line);
                     try
                     {
@@ -777,11 +783,11 @@ namespace DeMangleVC
             {
                 TypeVarType sType = GetVaraibleType();
                 String forDst = "";
-                if (iProcessPos < src.Length && src[iProcessPos] == '?')
+                if (iProcessPos < src.Length && src[iProcessPos] != '@')
                 {
                     forDst = GetQualifiedID(true).strQualifiedID;
                 }
-                sIdent = sType.getDeclaration(qID.strQualifiedID);// new Declarator(sType, qID).strDeclarator;//sType.Insert(qID).strType;
+                sIdent = sType.getDeclaration(qID.strQualifiedID);
                 if (forDst != "")
                 {
                     sIdent = sIdent + "{for `" + forDst + "'}";
@@ -1430,7 +1436,7 @@ namespace DeMangleVC
                     }
                     else
                     {
-                        retType = GetSpecialRef(false);
+                        retType = GetSpecialRef(true);
                     }
                     break;
                 default:
@@ -1560,16 +1566,7 @@ namespace DeMangleVC
             else
             {
                 sType.StrCVQualifier = GetCVQVar();
-                //bHasThis = false;
                 sType.TypeReferenced = GetTypeLikeID(false);
-                //if (subType.strType.Substring(0, subType.iInsPos).EndsWith(CVQ.getCVQ()))
-                //{   // avoid thing like : * const const &
-                //    sType = subType.Insert(suffix);
-                //}
-                //else
-                //{
-                //    sType = subType.Insert(CVQ.makeID(suffix));
-                //}
             }
             if (bPush)
             {
@@ -1748,7 +1745,6 @@ namespace DeMangleVC
         {
             TypeVarType retType = new TypeVarType();
             Type BaseType = new TypeSimple("");
-            //String strCVMod; // CV Modifiers
             int iSpecialVariable = 0;
             switch (src[iProcessPos])
             {
