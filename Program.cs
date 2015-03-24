@@ -283,7 +283,7 @@ namespace DeMangleVC
         }
         public override string getDeclaration(string qID, bool hasBrackt = false)
         {
-            return _strAccess + _type.getDeclaration(StringHelper.glue(StrCVQualifier, qID));
+            return _strAccess + _type.getDeclaration(StringHelper.glue(StrCVQualifier.EndsWith("::") ? "" : StrCVQualifier, qID));
         }
     }
 
@@ -764,6 +764,11 @@ namespace DeMangleVC
         public void Work()
         {
             dst = GetDeclaration();
+            if (iProcessPos < src.Length)
+            {
+                dst = src;
+                throw new Exception("symbols not exhausted");
+            }
         }
 
         public String GetDeclaration()
@@ -778,14 +783,30 @@ namespace DeMangleVC
             if (qID.strQualifiedID == "$_C#")
             {
                 sIdent = "`string'";
+                iProcessPos = src.Length;
             }
             else if (Char.IsDigit(src[iProcessPos])) // variable
             {
                 TypeVarType sType = GetVaraibleType();
                 String forDst = "";
-                if (iProcessPos < src.Length && src[iProcessPos] != '@')
+                if (iProcessPos < src.Length)
                 {
-                    forDst = GetQualifiedID(true).strQualifiedID;
+                    switch(src[iProcessPos])
+                    {
+                    case 'A':
+                        iProcessPos++;
+                        break;
+                    default:
+                        if (qID.strQualifiedID.EndsWith("::`vftable'") || qID.strQualifiedID.EndsWith("::`vbtable'") || qID.strQualifiedID.EndsWith("::`RTTI Complete Object Locator'"))
+                        {
+                            if (src[iProcessPos] != '@')
+                            {
+                                forDst = GetQualifiedID(true).strQualifiedID;
+                            }
+                            iProcessPos++;
+                        }
+                        break;
+                    }
                 }
                 sIdent = sType.getDeclaration(qID.strQualifiedID);
                 if (forDst != "")
@@ -832,8 +853,8 @@ namespace DeMangleVC
                         {
                             throw new Exception();
                         }
-                        //sIdent = "[thunk]:" + sRetType.Insert(qID.strQualifiedID + "`local static destructor helper\'", -1, true).strType;
                         sIdent = "[thunk]:" + sRetType.getDeclaration(qID.strQualifiedID + "`local static destructor helper\'");
+                        iProcessPos++;
                         break;
                     case 'B':
                         iProcessPos++;
@@ -843,6 +864,7 @@ namespace DeMangleVC
                             throw new Exception();
                         }
                         sIdent = "[thunk]: __thiscall " + qID.strQualifiedID + "{" + val.ToString() + ",{flat}}' }'";
+                        iProcessPos += 2;
                         break;
                     default:
                         throw new Exception();
@@ -1198,7 +1220,7 @@ namespace DeMangleVC
                     break;
                 case '?':
                     //iProcessPos++;
-                    uID = new UnqualifiedID('`' + GetDeclaration() + '\'', UnqualifiedID.enumUnqualifiedID.enmIdentifier);
+                    uID = new UnqualifiedID("`" + GetDeclaration() + "'", UnqualifiedID.enumUnqualifiedID.enmIdentifier);
                     break;
                 default:
                     throw new Exception("unknow character after \'?\' : " + src[iProcessPos]);
@@ -1245,7 +1267,6 @@ namespace DeMangleVC
             if (Char.IsDigit(src[iProcessPos]))
             {
                 retID = vUiD.Peek()[src[iProcessPos] - '0'];
-                //retStr = vBackRef.Peek()[src[iProcessPos] - '0'];
                 iProcessPos += 1;
             }
             else
@@ -1256,11 +1277,7 @@ namespace DeMangleVC
                     i++;
                 }
                 retID = new UnqualifiedID(src.Substring(iProcessPos, i), UnqualifiedID.enumUnqualifiedID.enmIdentifier);
-                //if (Push)
-                //{
                 vUiD.Peek().Add(retID);
-                //}
-                //vBackRef.Peek().Add(retStr);
                 if (i != 0)
                 {
                     iProcessPos += i + 1;

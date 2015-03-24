@@ -1,3 +1,8 @@
+?mgf@?1??GetMGF@?$PSSR_MEM@$0A@VP1363_MGF1@CryptoPP@@$0?0$0A@$0A@@CryptoPP@@EBEABVMaskGeneratingFunction@2@XZ@$AVP1363_MGF1@2@A
+??_R4bad_alloc@std@@6B@
+??_7bad_alloc@std@@6B@
+??_9@$BBIE@AE
+?Empty$initializer$@EST_String@@2P6AXXZEA
 ?pmField@?$CVarTypeInfo@D@ATL@@2QQtagVARIANT@@DQ3@ ATL::CVarTypeInfo<char>::pmField
 ??_7?$AlgorithmImpl@VTF_SignerBase@CryptoPP@@V?$TF_SS@UPKCS1v15@CryptoPP@@VSHA@2@URSA@2@H@2@@CryptoPP@@6BPK_SignatureScheme@1@@
 ??$?0V?$_List_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBKK@std@@@std@@@std@@@std@@V01@X@?$pair@V?$_List_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBKK@std@@@std@@@std@@@std@@V12@@std@@QAE@$$QAV?$_List_iterator@V?$_List_val@U?$_List_simple_types@U?$pair@$$CBKK@std@@@std@@@std@@@1@0@Z

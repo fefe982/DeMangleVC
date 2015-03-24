@@ -1,4 +1,9 @@
-public: static char tagVARIANT::* ATL::CVarTypeInfo<char>::pmField
+[thunk]:class PSSR_MEM<0,class CryptoPP::P1363_MGF1,-1,0,0>::P1363_MGF1 `private: virtual class PSSR_MEM<0,class CryptoPP::P1363_MGF1,-1,0,0>::MaskGeneratingFunction const & __thiscall CryptoPP::PSSR_MEM<0,class CryptoPP::P1363_MGF1,-1,0,0>::GetMGF(void)const'::`2'::mgf`local static destructor helper'
+const std::bad_alloc::`RTTI Complete Object Locator'
+const std::bad_alloc::`vftable'
+[thunk]: __thiscall `vcall'{388,{flat}}' }'
+public: static void (__cdecl * __ptr64 EST_String::Empty$initializer$)(void)
+public: static char tagVARIANT::* const ATL::CVarTypeInfo<char>::pmField
 const CryptoPP::AlgorithmImpl<class CryptoPP::TF_SignerBase,class CryptoPP::TF_SS<struct CryptoPP::PKCS1v15,class CryptoPP::SHA,struct CryptoPP::RSA,int> >::`vftable'{for `CryptoPP::PK_SignatureScheme'}
 public: __thiscall std::pair<class std::_List_iterator<class std::_List_val<struct std::_List_simple_types<struct std::pair<unsigned long const,unsigned long> > > >,class std::_List_iterator<class std::_List_val<struct std::_List_simple_types<struct std::pair<unsigned long const,unsigned long> > > > >::pair<class std::_List_iterator<class std::_List_val<struct std::_List_simple_types<struct std::pair<unsigned long const,unsigned long> > > >,class std::_List_iterator<class std::_List_val<struct std::_List_simple_types<struct std::pair<unsigned long const,unsigned long> > > > ><class std::_List_iterator<class std::_List_val<struct std::_List_simple_types<struct std::pair<unsigned long const,unsigned long> > > >,class std::_List_iterator<class std::_List_val<struct std::_List_simple_types<struct std::pair<unsigned long const,unsigned long> > > >,void>(class std::_List_iterator<class std::_List_val<struct std::_List_simple_types<struct std::pair<unsigned long const,unsigned long> > > > &&,class std::_List_iterator<class std::_List_val<struct std::_List_simple_types<struct std::pair<unsigned long const,unsigned long> > > > &&)
 const std::basic_fstream<char,struct std::char_traits<char> >::`vbtable'{for `std::basic_istream<char,struct std::char_traits<char> >'}
