@@ -1,3 +1,5 @@
+?__LINE__Var@?1??AcceptConnectionCond@@YGHPAU_WSABUF@@0PAU_QualityOfService@@100PAIK@Z@4JA@d07b0553
+??_7?$AutoSignaling@V?$InputRejecting@VBufferedTransformation@CryptoPP@@@CryptoPP@@@CryptoPP@@6BAlgorithm@1@@
 ?mgf@?1??GetMGF@?$PSSR_MEM@$0A@VP1363_MGF1@CryptoPP@@$0?0$0A@$0A@@CryptoPP@@EBEABVMaskGeneratingFunction@2@XZ@$AVP1363_MGF1@2@A
 ??_R4bad_alloc@std@@6B@
 ??_7bad_alloc@std@@6B@

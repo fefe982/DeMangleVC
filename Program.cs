@@ -163,7 +163,11 @@ namespace DeMangleVC
             }
             if (StrCVQualifier.EndsWith("::"))
             {
+#if REFINE__
                 strDecl = StrCVQualifier + StringHelper.glue(_strReferenceType, qID);
+#else
+                strDecl = StrCVQualifier + StringHelper.glue(_strReferenceType == "* const" ? "*" : _strReferenceType, qID);
+#endif
             }
             else
             {
@@ -176,7 +180,7 @@ namespace DeMangleVC
                 }
                 else
                 {
-                    strDecl = StringHelper.glue(StrCVQualifier, StringHelper.glue(_strReferenceType, qID));
+                    strDecl = StringHelper.glue(StrCVQualifier, StringHelper.glue(_strReferenceType == "* const" && qID.StartsWith("(") ? "*" : _strReferenceType, qID));
                 }
 #endif
             }
@@ -791,21 +795,21 @@ namespace DeMangleVC
                 String forDst = "";
                 if (iProcessPos < src.Length)
                 {
-                    switch(src[iProcessPos])
+                    if (qID.strQualifiedID.EndsWith("::`vftable'") || qID.strQualifiedID.EndsWith("::`vbtable'") || qID.strQualifiedID.EndsWith("::`RTTI Complete Object Locator'"))
                     {
-                    case 'A':
-                        iProcessPos++;
-                        break;
-                    default:
-                        if (qID.strQualifiedID.EndsWith("::`vftable'") || qID.strQualifiedID.EndsWith("::`vbtable'") || qID.strQualifiedID.EndsWith("::`RTTI Complete Object Locator'"))
+                        if (src[iProcessPos] != '@')
                         {
-                            if (src[iProcessPos] != '@')
-                            {
-                                forDst = GetQualifiedID(true).strQualifiedID;
-                            }
-                            iProcessPos++;
+                            forDst = GetQualifiedID(true).strQualifiedID;
                         }
-                        break;
+                        iProcessPos++;
+                    }
+                    else if (qID.strQualifiedID.EndsWith("::__LINE__Var"))
+                    {   // generated cont var for __LINE__ , may contain arbitrary hash to avoid confiliction
+                        if (src[iProcessPos] != '@' || iProcessPos < src.Length - 9)
+                        {
+                            throw new Exception();
+                        }
+                        iProcessPos += 9;
                     }
                 }
                 sIdent = sType.getDeclaration(qID.strQualifiedID);
@@ -1609,13 +1613,6 @@ namespace DeMangleVC
                 retType.StrSubcript = retType.StrSubcript + "[" + GetInteger() + "]";
             }
             retType.BaseType = GetTypeLikeID(false);
-
-
-            //Type = subType.Insert(sub, 0, false, true);
-            //if (bPush)
-            //{
-            //    vType.Peek().Add(Type);
-            //}
             return retType;
         }
 
@@ -1623,15 +1620,8 @@ namespace DeMangleVC
         {
             TypeReference retType = new TypeReference();
             retType.StrReferenceType = "*";
-            //String sFuncBody;
-            //String sFuncName;
-            //sFuncName = ""; //strCVQalifier.makeID("@");
-            //int iInsPos;
             retType.TypeReferenced = GetFunctionBody(bMemThis);
-            //iInsPos = sFuncBody.IndexOf("@");
-            //sFuncBody = sFuncBody.Replace("@", strPointer);
-            //iInsPos++;
-            return retType;//new TypeID(sFuncBody,iInsPos,true,false);
+            return retType;
         }
 
         private TypeFunctionBase GetFunctionBody(bool bHasThis)
@@ -1688,6 +1678,11 @@ namespace DeMangleVC
             case 'E':
                 iProcessPos++;
                 CVQ = "__ptr64";
+                if (src[iProcessPos] != 'A')
+                {
+                    throw new Exception();
+                }
+                iProcessPos++;
                 break;
             case 'Q':
                 iProcessPos++;
