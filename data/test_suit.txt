@@ -1,3 +1,13 @@
+??$?0HH@?$PK_FinalTemplate@V?$TF_VerifierImpl@U?$TF_SignatureSchemeOptions@V?$TF_SS@UPKCS1v15@CryptoPP@@VSHA@2@URSA@2@H@CryptoPP@@URSA@2@VPKCS1v15_SignatureMessageEncodingMethod@2@VSHA@2@@CryptoPP@@@CryptoPP@@@CryptoPP@@QAE@ABH0@Z ; complex back ref, string
+?accNavigate@CWnd@@UAEJJUtagVARIANT@@PAU2@@Z ; back ref, string
+??$_Advance@PAIH@std@@YAXAAPAIHUrandom_access_iterator_tag@0@@Z  std::_Advance<unsigned int *,int>  ; backref, string, template in base
+?lstrcmpiWFake@ATL@@YGHPB_W0@Z ATL::lstrcmpiWFake ; backref type
+??0type_info@@AAE@ABV0@@Z ; backref, string, backref in base
+??0CMultiDocTemplate@@QAE@IPAUCRuntimeClass@@00@Z CMultiDocTemplate::CMultiDocTemplate ; back ref, type
+??0?$CComCritSecLock@VCComCriticalSection@ATL@@@ATL@@QAE@AAVCComCriticalSection@1@_N@Z ; back ref, string
+??0CAboutDlg@@QAE@XZ ; ctor
+??_M@YGXPAXIHP6EX0@Z@Z ; back ref, type
+??$?2K@Wrapper@?$CSimpleArray@KV?$CSimpleArrayEqualHelper@K@ATL@@@ATL@@SAPAXIPAK@Z ATL::CSimpleArray<unsigned long,ATL::CSimpleArrayEqualHelper<unsigned long> >::Wrapper::operator new<unsigned long>: operator new
 ?mgf@?1??GetMGF@?$PSSR_MEM@$0A@VP1363_MGF1@CryptoPP@@$0?0$0A@$0A@@CryptoPP@@EBEABVMaskGeneratingFunction@2@XZ@$AVP1363_MGF1@2@A
 ??_R4bad_alloc@std@@6B@
 ??_7bad_alloc@std@@6B@
