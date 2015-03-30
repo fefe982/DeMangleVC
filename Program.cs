@@ -496,7 +496,10 @@ namespace DeMangleVC
             case 'Y':
                 iProcessPos = arrType.parse(src, pos, ref vType, ref vUiD);
                 retType = arrType;
-                vType.Add(retType);
+                if (Push)
+                {
+                    vType.Add(retType);
+                }
                 break;
             case '0':
             case '1':
@@ -847,8 +850,11 @@ namespace DeMangleVC
             }
             else
             {
-                iProcessPos = cvq.parse(src, iProcessPos, ref vType, ref vUiD);
-                StrCVQualifier = cvq.getResult();
+                if (!noCV)
+                {
+                    iProcessPos = cvq.parse(src, iProcessPos, ref vType, ref vUiD);
+                    StrCVQualifier = cvq.getResult();
+                }
                 TypeReferenced = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD);
             }
             saveParseStatus(src, pos, iProcessPos);
@@ -1456,7 +1462,8 @@ namespace DeMangleVC
             else if (src[iProcessPos] >= '0' && src[iProcessPos]<='9')
             {
                 _strUnqualifiedID = vUiD[src[iProcessPos]-'0']._strUnqualifiedID;
-                _eUnqualifiedIdType = vUiD[src[iProcessPos]-'0']._eUnqualifiedIdType;
+                // anything from back ref acts just like an identifier, this prevents it is added to backref again as a template ID
+                _eUnqualifiedIdType = enumUnqualifiedID.enmIdentifier;
                 iProcessPos++;
 #if TRACE
                 Console.Error.WriteLine("trace vUiD");
@@ -1571,6 +1578,7 @@ namespace DeMangleVC
                     default:
                         throw new Exception("Invalid RTTI descriptor");
                     }
+                    iProcessPos--;
                     _strUnqualifiedID = strOperatorID;
                     _eUnqualifiedIdType= UnqualifiedID.enumUnqualifiedID.enmRTTISymbols;
                 }

@@ -1,3 +1,6 @@
+??$_Move_backward_opt@PAU?$digraph@_W@re_detail@boost@@PAU123@Urandom_access_iterator_tag@std@@U_Undefined_move_tag@5@@std@@YAPAU?$digraph@_W@re_detail@boost@@PAU123@00Urandom_access_iterator_tag@0@U_Undefined_move_tag@0@U_Range_checked_iterator_tag@0@@Z ; backref, string
+??$?RHPB_WPB_WPB_W$$BY0CA@DPADPAD@?$bind_t@HV?$cmf7@HV?$codecvt@_WDH@std@@AAHPB_WPB_WAAPB_WPADPADAAPAD@_mfi@boost@@V?$list8@V?$value@PBV?$codecvt@_WDH@std@@@_bi@boost@@V?$arg@$00@3@V?$arg@$01@3@V?$arg@$02@3@V?$arg@$03@3@V?$arg@$04@3@V?$arg@$05@3@V?$arg@$06@3@@_bi@3@@_bi@boost@@QAEHAAHAAPB_W11AAY0CA@DAAPAD3@Z ; array ref
+??_R0?AVbad_alloc@std@@@8 ; RTTI Type Descriptor
 ??$?0HH@?$PK_FinalTemplate@V?$TF_VerifierImpl@U?$TF_SignatureSchemeOptions@V?$TF_SS@UPKCS1v15@CryptoPP@@VSHA@2@URSA@2@H@CryptoPP@@URSA@2@VPKCS1v15_SignatureMessageEncodingMethod@2@VSHA@2@@CryptoPP@@@CryptoPP@@@CryptoPP@@QAE@ABH0@Z ; complex back ref, string
 ?accNavigate@CWnd@@UAEJJUtagVARIANT@@PAU2@@Z ; back ref, string
 ??$_Advance@PAIH@std@@YAXAAPAIHUrandom_access_iterator_tag@0@@Z  std::_Advance<unsigned int *,int>  ; backref, string, template in base
