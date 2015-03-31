@@ -59,18 +59,6 @@ namespace DeMangleVC
         }
     }
 
-    public enum enumTypes
-    {
-        enmSimple,
-        enmReference,
-        enmClass,
-        enmFunctionBase,
-        enmNamedVar,
-        enmFunction,
-        enmVarType,
-        enmSpecialSuffix // some special non-var 'non type'
-    };
-
     /// <summary>
     /// base class for all class that correspond to some symbols segment, like identifier, name, etc
     /// </summary>
@@ -98,12 +86,12 @@ namespace DeMangleVC
         /// <summary>
         /// dump the underlying string and pased result
         /// </summary>
-        public void dump() { Console.Error.WriteLine("{0} {1} {2} . {3} . {4}", _start, _end, GetType().Name, _str, getResult()); }
+        protected void dump() { Console.Error.WriteLine("{0} {1} {2} . {3} . {4}", _start, _end, GetType().Name, _str, getDemangledString()); }
         /// <summary>
         /// Get the demangled result of this piece
         /// </summary>
         /// <returns></returns>
-        virtual public string getResult() { throw new NotImplementedException(); }
+        virtual public string getDemangledString() { throw new NotImplementedException(); }
 
         public Type toType() { return (Type)this; }
 
@@ -121,7 +109,7 @@ namespace DeMangleVC
     class StringComponent : ParseBase
     {
         protected string _strRes = "";
-        public override string getResult() { return _strRes; }
+        public override string getDemangledString() { return _strRes; }
         public static string getString(string src, ref int pos)
         {
             int startPos = pos;
@@ -174,7 +162,7 @@ namespace DeMangleVC
         }
         public static string GetTemplateArgumentList(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
         {
-            return new TemplateArguamentList().parse(src, ref pos, ref vType, ref vUiD).getResult();
+            return new TemplateArguamentList().parse(src, ref pos, ref vType, ref vUiD).getDemangledString();
         }
     }
 
@@ -300,22 +288,6 @@ namespace DeMangleVC
     class Type : ParseBase
     {
         #region enumeration constants
-        protected static String[] strCallConv = {
-            "__cdecl",
-            "__cdecl",
-            "__pascal",
-            "__pascal",
-            "__thiscall",
-            "__thiscall",
-            "__stdcall",
-            "__stdcall",
-            "__fastcall",
-            "__fastcall",
-            "",
-            "",
-            "__clrcall"
-        };
-
         protected static String[] strType = {
             "&",                // reference
             "& volatile",
@@ -411,13 +383,12 @@ namespace DeMangleVC
             get { return _strCVQualifier; }
         }
         virtual public String getTypeString() { throw new NotImplementedException(); }
-        virtual public enumTypes getTypeKind() { throw new NotImplementedException(); }
         virtual public String getDeclaration(String qID, bool bEnclose = false)
         {
             return StringHelper.glue(getTypeString(), qID);
         }
         virtual public void ajdustCVQ() { _strCVQualifier = ""; }
-        public override string getResult() { return getDeclaration("###"); }
+        public override string getDemangledString() { return getDeclaration("###"); }
         public static Type GetTypeLikeID(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD, bool topLevelType = false)
         {
             Type retType;
@@ -473,7 +444,7 @@ namespace DeMangleVC
                 Console.Error.WriteLine("dump vType");
                 for (int i = 0; i < vType.Count; i++)
                 {
-                    Console.Error.WriteLine("{0} , {1}", i, vType[i].getResult());
+                    Console.Error.WriteLine("{0} , {1}", i, vType[i].getDemangledString());
                 }
 #endif
                 iProcessPos++;
@@ -521,7 +492,7 @@ namespace DeMangleVC
                     iProcessPos++;
                     qID.parse(src, ref iProcessPos, ref vType, ref vUiD);
                     vTypeID.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                    retType = new TypeNonType("&" + vTypeID.getDeclaration(qID.strQualifiedID));
+                    retType = new TypeNonType("&" + vTypeID.getDeclaration(qID.getDemangledString()));
                     break;
                 case 'S':
                     retType = new TypeNonType(""); // Empty expansion list for integral types/size_t
@@ -570,10 +541,6 @@ namespace DeMangleVC
         {
             return _strType;
         }
-        public override enumTypes getTypeKind()
-        {
-            return enumTypes.enmSimple;
-        }
         public override string getDeclaration(string qID, bool hasBrackt = false)
         {
             return StringHelper.glue(_strType, qID);
@@ -588,11 +555,6 @@ namespace DeMangleVC
     class TypeSuffix : Type
     {
         private String _strSuffix;
-        public String strSuffix
-        {
-            get { return _strSuffix; }
-            set { _strSuffix = value; }
-        }
         public TypeSuffix(string suffix)
         {
             _strSuffix = suffix;
@@ -609,10 +571,6 @@ namespace DeMangleVC
         public bool bMemThis
         {
             get { return _bMemThis; }
-        }
-        public override string getResult()
-        {
-            return _strRes;
         }
         public override ParseBase parse(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
         {
@@ -637,7 +595,7 @@ namespace DeMangleVC
                 break;
             case 'Q':
                 iProcessPos++;
-                _strRes = new NestNameSpecifier().parse(src, ref iProcessPos, ref vType, ref vUiD).getResult();
+                _strRes = new NestNameSpecifier().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
                 iProcessPos--;
                 break;
             case '6':
@@ -645,7 +603,7 @@ namespace DeMangleVC
                 break;
             case '8':
                 iProcessPos++;
-                _strRes = new NestNameSpecifier().parse(src, ref iProcessPos, ref vType, ref vUiD).getResult();
+                _strRes = new NestNameSpecifier().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
                 _bMemThis = true;
                 iProcessPos--;
                 break;
@@ -662,26 +620,10 @@ namespace DeMangleVC
     class TypeReference : Type
     {
         private String _strReferenceType = "";
-
-        public String StrReferenceType
-        {
-            get { return _strReferenceType; }
-            set { _strReferenceType = value; }
-        }
         private Type _typeReferenced;
-
-        internal Type TypeReferenced
-        {
-            get { return _typeReferenced; }
-            set { _typeReferenced = value; }
-        }
         public override String getTypeString()
         {
             return getDeclaration("");
-        }
-        public override enumTypes getTypeKind()
-        {
-            return enumTypes.enmReference;
         }
         public override string getDeclaration(string qID, bool bEnclose = false)
         {
@@ -721,7 +663,6 @@ namespace DeMangleVC
         public override ParseBase parse(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
         {
             int iProcessPos = pos;
-            bool bHasThis;
             bool noCV = false;
             switch (src[iProcessPos])
             {
@@ -733,18 +674,15 @@ namespace DeMangleVC
             case 'S':
                 if (src[iProcessPos + 1] == 'E')
                 {
-                    StrReferenceType = strTypeE[src[iProcessPos] - 'A'];
+                    _strReferenceType = strTypeE[src[iProcessPos] - 'A'];
                     iProcessPos++;
                 }
                 else
                 {
-                    StrReferenceType = strType[src[iProcessPos] - 'A'];
+                    _strReferenceType = strType[src[iProcessPos] - 'A'];
                 }
                 break;
             case '?': // type transfered by value
-                //iProcessPos++;
-                //StrCVQualifier = GetCVQVar();
-                //TypeReferenced = Type.GetTypeLikeID(false);
                 break;
             case '$':
                 iProcessPos++;
@@ -756,26 +694,14 @@ namespace DeMangleVC
                 switch (src[iProcessPos])
                 {
                 case 'A': // function pointers
-                    //iProcessPos++;
-                    //sType.StrCVQualifier = GetCVQFunc(out bHasThis);
-                    //sType.TypeReferenced = GetFunctionBody(bHasThis);
                     break;
                 case 'B': // in parameter, array, no CV qualifier
-                    //iProcessPos++;
                     noCV = true;
-                    //sType.TypeReferenced = GetTypeLikeID(false);
                     break;
                 case 'C': // in template paramter list
-                    //case '?': // type transfered by value
-                    //iProcessPos++;
-                    //sType.StrCVQualifier = GetCVQVar();
-                    //sType.TypeReferenced = GetTypeLikeID(false);
                     break;
                 case 'Q':
-                    //iProcessPos++;
-                    StrReferenceType = "&&";
-                    //sType.StrCVQualifier = GetCVQVar();
-                    //sType.TypeReferenced = GetTypeLikeID(false);
+                    _strReferenceType = "&&";
                     break;
                 default:
                     throw new Exception("illegal Special Ref : " + src[iProcessPos]);
@@ -788,16 +714,16 @@ namespace DeMangleVC
             CVQ cvq = new CVQ();
             if (Char.IsDigit(src[iProcessPos]))
             {
-                _strCVQualifier = cvq.parse(src, ref iProcessPos, ref vType, ref vUiD).getResult();
-                TypeReferenced = new TypeFunctionBase(cvq.bMemThis).parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
+                _strCVQualifier = cvq.parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+                _typeReferenced = new TypeFunctionBase(cvq.bMemThis).parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
             }
             else
             {
                 if (!noCV)
                 {
-                    _strCVQualifier = cvq.parse(src, ref iProcessPos, ref vType, ref vUiD).getResult();
+                    _strCVQualifier = cvq.parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
                 }
-                TypeReferenced = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD);
+                _typeReferenced = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD);
             }
             saveParseStatus(src, pos, iProcessPos);
             pos = iProcessPos;
@@ -808,36 +734,10 @@ namespace DeMangleVC
     class TypeClass : Type
     {
         private String _strClassQualifiedName;
-
-        public String StrClassQualifiedName
-        {
-            get { return _strClassQualifiedName; }
-            set { _strClassQualifiedName = value; }
-        }
-        private QualifiedID className;
-
-        private bool _bTemplate;
-
-        public bool BTemplate
-        {
-            get { return _bTemplate; }
-            set { _bTemplate = value; }
-        }
-        private String _ClassKey;
-
-        public String ClassKey
-        {
-            get { return _ClassKey; }
-            set { _ClassKey = value; }
-        }
-
+        private String _classKey;
         public override string getTypeString()
         {
-            return _ClassKey + " " + _strClassQualifiedName;
-        }
-        public override enumTypes getTypeKind()
-        {
-            return enumTypes.enmClass;
+            return _classKey + " " + _strClassQualifiedName;
         }
 
         public override ParseBase parse(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
@@ -868,8 +768,8 @@ namespace DeMangleVC
             case 'V':
             case 'W':
                 iProcessPos++;
-                ClassKey = StringHelper.glue(strType[cType - 'A'], infixEnum);
-                StrClassQualifiedName = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getResult();
+                _classKey = StringHelper.glue(strType[cType - 'A'], infixEnum);
+                _strClassQualifiedName = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
                 break;
             default:
                 throw new Exception("illegal compound : " + cType);
@@ -883,19 +783,7 @@ namespace DeMangleVC
     class TypeArray : Type
     {
         private String _strSubcript;
-
-        public String StrSubcript
-        {
-            get { return _strSubcript; }
-            set { _strSubcript = value; }
-        }
         private Type _baseType;
-
-        internal Type BaseType
-        {
-            get { return _baseType; }
-            set { _baseType = value; }
-        }
         public override string getDeclaration(string qID, bool hasBrackt = false)
         {
             //String Decl = "";
@@ -922,12 +810,12 @@ namespace DeMangleVC
                 throw new Exception("Error Array Identifier");
             }
             iProcessPos++;
-            StrSubcript = "";
+            _strSubcript = "";
 
             long Dimension = StringComponent.getInteger(src, ref iProcessPos);
             for (long i = 0; i < Dimension; i++)
             {
-                StrSubcript = StrSubcript + "[" + StringComponent.getInteger(src, ref iProcessPos) + "]";
+                _strSubcript = _strSubcript + "[" + StringComponent.getInteger(src, ref iProcessPos) + "]";
             }
             _baseType = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD);
             saveParseStatus(src, pos, iProcessPos);
@@ -939,71 +827,55 @@ namespace DeMangleVC
     class TypeVarType : Type
     {
         private String _strAccess;
-
-        public String StrAccess
-        {
-            get { return _strAccess; }
-            set { _strAccess = value; }
-        }
-        private Type _type;
-
-        public Type InnerType
-        {
-            get { return _type; }
-            set { _type = value; }
-        }
-        public override enumTypes getTypeKind()
-        {
-            return enumTypes.enmVarType;
-        }
+        private Type _baseType;
         public override string getTypeString()
         {
             return getDeclaration("");
         }
         public override string getDeclaration(string qID, bool hasBrackt = false)
         {
-            return _strAccess + _type.getDeclaration(StringHelper.glue(StrCVQualifier.EndsWith("::") ? "" : StrCVQualifier, qID));
+            return _strAccess + _baseType.getDeclaration(StringHelper.glue(StrCVQualifier.EndsWith("::") ? "" : StrCVQualifier, qID));
         }
         public override ParseBase parse(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
         {
             int iProcessPos = pos;
-            Type BaseType = new TypeSimple("");
+            _baseType = new TypeSimple("");
             int iSpecialVariable = 0;
             switch (src[iProcessPos])
             {
             case '0':
-                StrAccess = "private: static ";
+                _strAccess = "private: static ";
                 break;
             case '1':
-                StrAccess = "protected: static ";
+                _strAccess = "protected: static ";
                 break;
             case '2':
-                StrAccess = "public: static ";
+                _strAccess = "public: static ";
                 break;
             case '3':
-                StrAccess = "";
+                _strAccess = "";
                 break;
             case '4': // function scope static variable
-                StrAccess = "";
+                _strAccess = "";
                 break;
             case '5':
-                StrAccess = "";
+                _strAccess = "";
                 iSpecialVariable = 5;
                 break;
             case '6': // `vftable'
-                StrAccess = "";
+                _strAccess = "";
                 iSpecialVariable = 6;
                 break;
             case '7': // `vbtable'
-                StrAccess = "";
+                _strAccess = "";
                 iSpecialVariable = 7;
                 break;
             case '8':
-                StrAccess = "";
+                _strAccess = "";
                 iSpecialVariable = 8;
                 break;
             case '9':
-                StrAccess = "";
+                _strAccess = "";
                 iSpecialVariable = 9;
                 break;
             default:
@@ -1014,20 +886,19 @@ namespace DeMangleVC
 
             if (iSpecialVariable < 5)
             {
-                BaseType = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD);
+                _baseType = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD);
             }
 
             if (iSpecialVariable != 9 && iSpecialVariable != 8 && iSpecialVariable != 5)
             {
-                _strCVQualifier = (new CVQ()).parse(src, ref iProcessPos, ref vType, ref vUiD).getResult();
+                _strCVQualifier = (new CVQ()).parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
             }
 
             if (iSpecialVariable == 5)
             {
-                BaseType = new TypeSuffix("{" + StringComponent.getInteger(src, ref iProcessPos).ToString() + "}'");///, 0, false, false);
+                _baseType = new TypeSuffix("{" + StringComponent.getInteger(src, ref iProcessPos).ToString() + "}'");///, 0, false, false);
             }
 
-            InnerType = BaseType;
             saveParseStatus(src, pos, iProcessPos);
             pos = iProcessPos;
             return this;
@@ -1036,41 +907,26 @@ namespace DeMangleVC
 
     class TypeFunctionBase : Type
     {
+        protected static readonly String[] strCallConv = {
+            "__cdecl",
+            "__cdecl",
+            "__pascal",
+            "__pascal",
+            "__thiscall",
+            "__thiscall",
+            "__stdcall",
+            "__stdcall",
+            "__fastcall",
+            "__fastcall",
+            "",
+            "",
+            "__clrcall"
+        };
         private String _strCallConversion;
-
-        public String StrCallConversion
-        {
-            get { return _strCallConversion; }
-            set { _strCallConversion = value; }
-        }
         private String _strParamList;
-
-        public String StrParamList
-        {
-            get { return _strParamList; }
-            set { _strParamList = value; }
-        }
         private String _strCVQThis = "";
-
-        public String StrCVQThis
-        {
-            get { return _strCVQThis; }
-            set { _strCVQThis = value; }
-        }
         private String _strExceptionList;
-
-        public String StrExceptionList
-        {
-            get { return _strExceptionList; }
-            set { _strExceptionList = value; }
-        }
         private Type _typeReturn;
-
-        internal Type TypeReturn
-        {
-            get { return _typeReturn; }
-            set { _typeReturn = value; }
-        }
         private bool _bHasThis;
         public TypeFunctionBase(bool bHasThis = false)
         {
@@ -1130,33 +986,33 @@ namespace DeMangleVC
             {
                 if (src[iProcessPos] == 'E')
                 {
-                    StrCVQThis = "__ptr64";
+                    _strCVQThis = "__ptr64";
                     iProcessPos++;
                 }
-                StrCVQThis = new CVQ().parse(src, ref iProcessPos, ref vType, ref vUiD).getResult() + StrCVQThis;
+                _strCVQThis = new CVQ().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString() + _strCVQThis;
             }
-            StrCallConversion = strCallConv[src[iProcessPos] - 'A'];
+            _strCallConversion = strCallConv[src[iProcessPos] - 'A'];
             iProcessPos++;
             if (src[iProcessPos] == '@')
             {
                 iProcessPos++;
-                TypeReturn = new TypeSimple("");
+                _typeReturn = new TypeSimple("");
             }
             else
             {
                 _typeReturn = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD);
             }
             ParameterClause p = new ParameterClause();
-            StrParamList = "(" + p.parse(src, ref iProcessPos, ref vType, ref vUiD).getResult() + ")";
-            StrExceptionList = p.parse(src, ref iProcessPos, ref vType, ref vUiD).getResult();
+            _strParamList = "(" + p.parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString() + ")";
+            _strExceptionList = p.parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
 
-            if (StrExceptionList == "...")
+            if (_strExceptionList == "...")
             {
-                StrExceptionList = "";
+                _strExceptionList = "";
             }
             else
             {
-                StrExceptionList = " throw(" + StrExceptionList + ")";
+                _strExceptionList = " throw(" + _strExceptionList + ")";
             }
             saveParseStatus(src, pos, iProcessPos);
             pos = iProcessPos;
@@ -1383,11 +1239,11 @@ namespace DeMangleVC
                 if (src[iProcessPos] == '$')
                 {
                     iProcessPos++;
-                    getTemplateID(src, ref iProcessPos, ref vType, ref vUiD);
+                    parseTemplateID(src, ref iProcessPos, ref vType, ref vUiD);
                 }
                 else
                 {
-                    getOperatorFunctionID(src, ref iProcessPos, ref vType, ref vUiD);
+                    parseOperatorFunctionID(src, ref iProcessPos, ref vType, ref vUiD);
                 }
             }
             else if (src[iProcessPos] >= '0' && src[iProcessPos] <= '9')
@@ -1399,7 +1255,7 @@ namespace DeMangleVC
                 Console.Error.WriteLine("trace vUiD");
                 for (int i = 0; i < vUiD.Count; i++)
                 {
-                    Console.Error.WriteLine("{0} : {1}", i, vUiD[i].getResult());
+                    Console.Error.WriteLine("{0} : {1}", i, vUiD[i].getDemangledString());
                 }
 #endif
             }
@@ -1411,7 +1267,7 @@ namespace DeMangleVC
             }
             pos = iProcessPos;
         }
-        private void getTemplateID(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
+        private void parseTemplateID(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
         {
             int iProcessPos = pos;
 
@@ -1420,7 +1276,7 @@ namespace DeMangleVC
             UnqualifiedID TplName = new UnqualifiedID(true);
             TplName.parse(src, ref iProcessPos, ref vType, ref vUiDN);
 
-            String TplParaList = (new TemplateArguamentList()).parse(src, ref iProcessPos, ref vTypeN, ref vUiDN).getResult();
+            String TplParaList = (new TemplateArguamentList()).parse(src, ref iProcessPos, ref vTypeN, ref vUiDN).getDemangledString();
             if (TplParaList.EndsWith(">"))
             {
                 TplParaList += " ";
@@ -1431,7 +1287,7 @@ namespace DeMangleVC
             _eUnqualifiedIdType = TplID._eUnqualifiedIdType;
             pos = iProcessPos;
         }
-        private void getOperatorFunctionID(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
+        private void parseOperatorFunctionID(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
         {
             String strOperatorID = "";
             _strRes = null;
@@ -1531,7 +1387,7 @@ namespace DeMangleVC
                         String Decl = "";
                         if (src[iProcessPos] == '?')
                         {
-                            Decl = new Declaration().parse(src, ref iProcessPos, ref vType, ref vUiD).getResult();
+                            Decl = new Declaration().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
                         }
                         else
                         {
@@ -1546,7 +1402,7 @@ namespace DeMangleVC
                         String Decl = "";
                         if (src[iProcessPos] == '?')
                         {
-                            Decl = Decl = new Declaration().parse(src, ref iProcessPos, ref vType, ref vUiD).getResult();
+                            Decl = Decl = new Declaration().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
                         }
                         else
                         {
@@ -1629,11 +1485,11 @@ namespace DeMangleVC
                     break;
                 case '$':
                     iProcessPos++;
-                    getTemplateID(src, ref iProcessPos, ref vType, ref vUiD);
+                    parseTemplateID(src, ref iProcessPos, ref vType, ref vUiD);
                     vUiD.Add(this);
                     break;
                 case '?':
-                    _strRes = "`" + (new Declaration()).parse(src, ref iProcessPos, ref vType, ref vUiD).getResult() + "'";
+                    _strRes = "`" + (new Declaration()).parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString() + "'";
                     _eUnqualifiedIdType = UnqualifiedID.enumUnqualifiedID.enmIdentifier;
                     break;
                 default:
@@ -1710,15 +1566,9 @@ namespace DeMangleVC
         }
     }
 
-    class NestNameSpecifier : ParseBase
+    class NestNameSpecifier : StringComponent
     {
-        String _strNestNameSpecifier;
-        public String strNestNameSpecifier
-        {
-            get { return _strNestNameSpecifier; }
-        }
         UnqualifiedID _uidFirstQualifier;
-
         public UnqualifiedID uidFirstQualifier
         {
             get { return _uidFirstQualifier; }
@@ -1728,7 +1578,7 @@ namespace DeMangleVC
         {
             if (uID.eUnqualifiedIdType == UnqualifiedID.enumUnqualifiedID.enmIdentifier || uID.eUnqualifiedIdType == UnqualifiedID.enumUnqualifiedID.enmTemplateID)
             {
-                _strNestNameSpecifier = uID.getResult() + "::" + _strNestNameSpecifier;
+                _strRes = uID.getDemangledString() + "::" + _strRes;
             }
             else
             {
@@ -1736,14 +1586,10 @@ namespace DeMangleVC
             }
             return this;
         }
-        public override string getResult()
-        {
-            return _strNestNameSpecifier;
-        }
         public override ParseBase parse(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
         {
             int iProcessPos = pos;
-            _strNestNameSpecifier = null;
+            _strRes = null;
             while (src[iProcessPos] != '@')
             {
                 UnqualifiedID uIDCNSName;
@@ -1755,7 +1601,7 @@ namespace DeMangleVC
                     Console.Error.WriteLine("trace vUiD");
                     for (int i = 0; i < vUiD.Count; i++)
                     {
-                        Console.Error.WriteLine("{0} : {1}", i, vUiD[i].getResult());
+                        Console.Error.WriteLine("{0} : {1}", i, vUiD[i].getDemangledString());
                     }
 #endif
                 }
@@ -1763,7 +1609,7 @@ namespace DeMangleVC
                 {
                     uIDCNSName = new UnqualifiedID(false);
                     uIDCNSName.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                    if (strNestNameSpecifier == null)
+                    if (_strRes == null)
                     {
                         _uidFirstQualifier = uIDCNSName;
                     }
@@ -1780,17 +1626,13 @@ namespace DeMangleVC
 
     class QualifiedID : StringComponent
     {
-        public String strQualifiedID
-        {
-            get { return _strRes; }
-        }
         public QualifiedID(UnqualifiedID idt)
         {
-            _strRes = idt.getResult();
+            _strRes = idt.getDemangledString();
         }
         public QualifiedID(NestNameSpecifier Qualifier, UnqualifiedID uID)
         {
-            _strRes = Qualifier.strNestNameSpecifier + uID.getResult();
+            _strRes = Qualifier.getDemangledString() + uID.getDemangledString();
         }
 
         private bool _isDecl;
@@ -1811,7 +1653,7 @@ namespace DeMangleVC
             }
             if (uIDBaseID.eUnqualifiedIdType == UnqualifiedID.enumUnqualifiedID.enmString)
             {
-                _strRes = uIDBaseID.getResult();
+                _strRes = uIDBaseID.getDemangledString();
             }
             else
             {
@@ -1822,7 +1664,7 @@ namespace DeMangleVC
                 {   // base name can be template, so it may just CONTAIN the constructor
                     uIDBaseID.ReplaceCtorDtor(nnsQualifier.uidFirstQualifier);
                 }
-                _strRes = nnsQualifier.strNestNameSpecifier + uIDBaseID.getResult();
+                _strRes = nnsQualifier.getDemangledString() + uIDBaseID.getDemangledString();
             }
             saveParseStatus(src, pos, iProcessPos);
             pos = iProcessPos;
@@ -1843,7 +1685,7 @@ namespace DeMangleVC
             QualifiedID qID = new QualifiedID(true);
             qID.parse(src, ref iProcessPos, ref vType, ref vUiD);
             String sIdent = "";
-            if (qID.strQualifiedID == "$_C#")
+            if (qID.getDemangledString() == "$_C#")
             {
                 sIdent = "`string'";
                 iProcessPos = src.Length;
@@ -1861,18 +1703,18 @@ namespace DeMangleVC
                         iProcessPos++;
                         break;
                     default:
-                        if (qID.strQualifiedID.EndsWith("::`vftable'") || qID.strQualifiedID.EndsWith("::`vbtable'") || qID.strQualifiedID.EndsWith("::`RTTI Complete Object Locator'"))
+                        if (qID.getDemangledString().EndsWith("::`vftable'") || qID.getDemangledString().EndsWith("::`vbtable'") || qID.getDemangledString().EndsWith("::`RTTI Complete Object Locator'"))
                         {
                             if (src[iProcessPos] != '@')
                             {
-                                forDst = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getResult();
+                                forDst = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
                             }
                             iProcessPos++;
                         }
                         break;
                     }
                 }
-                sIdent = sType.getDeclaration(qID.strQualifiedID);
+                sIdent = sType.getDeclaration(qID.getDemangledString());
                 if (forDst != "")
                 {
                     sIdent = sIdent + "{for `" + forDst + "'}";
@@ -1883,14 +1725,14 @@ namespace DeMangleVC
                 String sModifier;
                 FunctionModifier funcM = new FunctionModifier();
                 funcM.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                sModifier = funcM.getResult();//getFunctionModifier(out bHasThis, out sThunkAdjustor);
+                sModifier = funcM.getDemangledString();//getFunctionModifier(out bHasThis, out sThunkAdjustor);
                 if (sModifier.Length > 0)
                 {
                     sModifier = sModifier + " ";
                 }
                 TypeFunctionBase func = new TypeFunctionBase(funcM.bHasThis);
                 func.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                String sFuncBody = func.getDeclaration(qID.strQualifiedID + funcM.sThunkAdjustor);
+                String sFuncBody = func.getDeclaration(qID.getDemangledString() + funcM.sThunkAdjustor);
                 sIdent = sModifier + sFuncBody;
             }
             else
@@ -1909,7 +1751,7 @@ namespace DeMangleVC
                             String sModifier = "[thunk]:public: virtual ";
                             TypeFunctionBase func = new TypeFunctionBase(true);
                             func.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                            String sFuncBody = func.getDeclaration(qID.strQualifiedID + "`vtordisp{" + val1 + "," + val2 + "}' ");
+                            String sFuncBody = func.getDeclaration(qID.getDemangledString() + "`vtordisp{" + val1 + "," + val2 + "}' ");
                             sIdent = sModifier + sFuncBody;
                             break;
                         }
@@ -1920,7 +1762,7 @@ namespace DeMangleVC
                         {
                             throw new Exception();
                         }
-                        sIdent = "[thunk]:" + sRetType.getDeclaration(qID.strQualifiedID + "`local static destructor helper\'");
+                        sIdent = "[thunk]:" + sRetType.getDeclaration(qID.getDemangledString() + "`local static destructor helper\'");
                         iProcessPos++;
                         break;
                     case 'B':
@@ -1930,7 +1772,7 @@ namespace DeMangleVC
                         {
                             throw new Exception();
                         }
-                        sIdent = "[thunk]: __thiscall " + qID.strQualifiedID + "{" + val.ToString() + ",{flat}}' }'";
+                        sIdent = "[thunk]: __thiscall " + qID.getDemangledString() + "{" + val.ToString() + ",{flat}}' }'";
                         iProcessPos += 2;
                         break;
                     default:
@@ -1974,7 +1816,7 @@ namespace DeMangleVC
                 dst = src;
                 throw new Exception("Symbols not exhausted");
             }
-            dst = d.getResult();
+            dst = d.getDemangledString();
         }
 
         public String GetResult()
