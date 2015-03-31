@@ -11,6 +11,8 @@ public: __thiscall ATL::CComCritSecLock<class ATL::CComCriticalSection>::CComCri
 public: __thiscall CAboutDlg::CAboutDlg(void)
 void __stdcall `eh vector destructor iterator'(void *,unsigned int,int,void (__thiscall *)(void *))
 public: static void * __cdecl ATL::CSimpleArray<unsigned long,class ATL::CSimpleArrayEqualHelper<unsigned long> >::Wrapper::operator new<unsigned long>(unsigned int,unsigned long *)
+long `int __stdcall AcceptConnectionCond(struct _WSABUF *,struct _WSABUF *,struct _QualityOfService *,struct _QualityOfService *,struct _WSABUF *,struct _WSABUF *,unsigned int *,unsigned long)'::`2'::__LINE__Var
+const CryptoPP::AutoSignaling<class CryptoPP::InputRejecting<class CryptoPP::BufferedTransformation> >::`vftable'{for `CryptoPP::Algorithm'}
 [thunk]:class PSSR_MEM<0,class CryptoPP::P1363_MGF1,-1,0,0>::P1363_MGF1 `private: virtual class PSSR_MEM<0,class CryptoPP::P1363_MGF1,-1,0,0>::MaskGeneratingFunction const & __thiscall CryptoPP::PSSR_MEM<0,class CryptoPP::P1363_MGF1,-1,0,0>::GetMGF(void)const'::`2'::mgf`local static destructor helper'
 const std::bad_alloc::`RTTI Complete Object Locator'
 const std::bad_alloc::`vftable'

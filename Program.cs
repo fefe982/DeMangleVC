@@ -592,6 +592,11 @@ namespace DeMangleVC
                 break;
             case 'E':
                 _strRes = "__ptr64";
+                iProcessPos++;
+                if (src[iProcessPos] != 'A')
+                {
+                    throw new Exception();
+                }
                 break;
             case 'Q':
                 iProcessPos++;
@@ -637,7 +642,11 @@ namespace DeMangleVC
             }
             if (StrCVQualifier.EndsWith("::"))
             {
+#if REFINE__
                 strDecl = StrCVQualifier + StringHelper.glue(_strReferenceType, qID);
+#else
+                strDecl = StrCVQualifier + StringHelper.glue(_strReferenceType == "* const" ? "*" : _strReferenceType, qID);
+#endif
             }
             else
             {
@@ -650,7 +659,7 @@ namespace DeMangleVC
                 }
                 else
                 {
-                    strDecl = StringHelper.glue(StrCVQualifier, StringHelper.glue(_strReferenceType, qID));
+                    strDecl = StringHelper.glue(StrCVQualifier, StringHelper.glue(_strReferenceType == "* const" && qID.StartsWith("(") ? "*" : _strReferenceType, qID));
                 }
 #endif
             }
@@ -1699,9 +1708,6 @@ namespace DeMangleVC
                 {
                     switch (src[iProcessPos])
                     {
-                    case 'A':
-                        iProcessPos++;
-                        break;
                     default:
                         if (qID.getDemangledString().EndsWith("::`vftable'") || qID.getDemangledString().EndsWith("::`vbtable'") || qID.getDemangledString().EndsWith("::`RTTI Complete Object Locator'"))
                         {
@@ -1710,6 +1716,14 @@ namespace DeMangleVC
                                 forDst = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
                             }
                             iProcessPos++;
+                        }
+                        else if (qID.getDemangledString().EndsWith("::__LINE__Var"))
+                        {   // generated cont var for __LINE__ , may contain arbitrary hash to avoid confiliction
+                            if (src[iProcessPos] != '@' || iProcessPos < src.Length - 9)
+                            {
+                                throw new Exception();
+                            }
+                            iProcessPos += 9;
                         }
                         break;
                     }
