@@ -1,3 +1,4 @@
+??__K_w@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PB_SI@Z operator "" _w
 ?fxunc@A@@QGAEHXZ A::fxunc ; ref_specifier
 ?fxunc@A@@QGBEHXZ A::fxunc
 ?fxunc@A@@QGCEHXZ A::fxunc

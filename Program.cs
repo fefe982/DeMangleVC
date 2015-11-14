@@ -365,7 +365,7 @@ namespace DeMangleVC
             "_P",
             "_Q",
             "_R",
-            "_S",
+            "char16_t",
             "_T",
             "_U",
             "_V",
@@ -464,6 +464,7 @@ namespace DeMangleVC
                 case 'L':
                 case 'M':
                 case 'N':
+                case 'S':
                 case 'W':
                     retType = new TypeSimple(strType_[src[iProcessPos] - 'A']);
                     iProcessPos++;
@@ -504,6 +505,11 @@ namespace DeMangleVC
                     {   // "$$V" for empty template parameter list
                         retType = new TypeNonType("");
                         iProcessPos += 2;
+                    }
+                    else if (src[iProcessPos] == 'V')
+                    {
+                        retType = new TypeNonType("");
+                        iProcessPos++;
                     }
                     else
                     {
@@ -1448,6 +1454,13 @@ namespace DeMangleVC
                             iProcessPos--;
                         }
                         strOperatorID = "`dynamic atexit destructor for '" + Decl + "''";
+                    }
+                    else if (src[iProcessPos] == 'K')
+                    {
+                        iProcessPos++;
+                        String name = StringComponent.getString(src, ref iProcessPos);
+                        strOperatorID = "operator \"\" " + name;
+                        iProcessPos--;
                     }
                     else if (src[iProcessPos] >= 'A' && src[iProcessPos] <= 'Z')
                     {

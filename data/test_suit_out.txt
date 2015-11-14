@@ -1,3 +1,4 @@
+class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > __cdecl operator "" _w(char16_t const *,unsigned int)
 public: int __thiscall A::fxunc(void)&
 public: int __thiscall A::fxunc(void)const&
 public: int __thiscall A::fxunc(void)volatile&

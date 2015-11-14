@@ -41,8 +41,9 @@ TplParaList :=
     TplPara TplParaList
 
 TplPara :=
-	'$$V'   // empty parameter expansion (type)
-	'$S'    // empty parameter expansion (size_t)
+    '$$$V'  // empty parameter expansion (type)
+    '$$V'   // empty parameter expansion (type)
+    '$S'    // empty parameter expansion (size_t)
     Type
     IntTplPara
     RefTplPara
@@ -255,3 +256,4 @@ OperatorName :=
     '?__F' Ident		// `dynamic atexit destructor for '.''
 	'?__F' StringName	// `dynamic atexit destructor for '.''
     '?__G'   // `vector copy constructor iterator'
+	'?__K' StringName   // user define literal operators
