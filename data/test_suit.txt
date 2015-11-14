@@ -1,3 +1,11 @@
+?fxunc@A@@QGAEHXZ A::fxunc ; ref_specifier
+?fxunc@A@@QGBEHXZ A::fxunc
+?fxunc@A@@QGCEHXZ A::fxunc
+?fxunc@A@@QGDEHXZ A::fxunc
+?fxunc@A@@QHAEHXZ A::fxunc
+?fxunc@A@@QHBEHXZ A::fxunc
+?fxunc@A@@QHCEHXZ A::fxunc
+?fxunc@A@@QHDEHXZ A::fxunc
 ??$_Move_backward_opt@PAU?$digraph@_W@re_detail@boost@@PAU123@Urandom_access_iterator_tag@std@@U_Undefined_move_tag@5@@std@@YAPAU?$digraph@_W@re_detail@boost@@PAU123@00Urandom_access_iterator_tag@0@U_Undefined_move_tag@0@U_Range_checked_iterator_tag@0@@Z ; backref, string
 ??$?RHPB_WPB_WPB_W$$BY0CA@DPADPAD@?$bind_t@HV?$cmf7@HV?$codecvt@_WDH@std@@AAHPB_WPB_WAAPB_WPADPADAAPAD@_mfi@boost@@V?$list8@V?$value@PBV?$codecvt@_WDH@std@@@_bi@boost@@V?$arg@$00@3@V?$arg@$01@3@V?$arg@$02@3@V?$arg@$03@3@V?$arg@$04@3@V?$arg@$05@3@V?$arg@$06@3@@_bi@3@@_bi@boost@@QAEHAAHAAPB_W11AAY0CA@DAAPAD3@Z ; array ref
 ??_R0?AVbad_alloc@std@@@8 ; RTTI Type Descriptor

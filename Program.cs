@@ -501,7 +501,7 @@ namespace DeMangleVC
                 case '$': // Simple ref, will use the letter C,
                     iProcessPos++;
                     if (src[iProcessPos] == '$' && src[iProcessPos + 1] == 'V')
-                    {   // "$$$V@" for empty template parameter list
+                    {   // "$$V" for empty template parameter list
                         retType = new TypeNonType("");
                         iProcessPos += 2;
                     }
@@ -576,19 +576,43 @@ namespace DeMangleVC
         {
             int iProcessPos = pos;
             _bMemThis = false;
+            string suffix = "";
             switch (src[iProcessPos])
             {
             case 'A':
-                _strRes = "";
-                break;
             case 'B':
-                _strRes = "const";
-                break;
             case 'C':
-                _strRes = "volatile";
-                break;
             case 'D':
-                _strRes = "const volatile";
+            case 'G':
+            case 'H':
+                if (src[iProcessPos] == 'G')
+                {
+                    suffix = "&";
+                    iProcessPos++;
+                }
+                else if (src[iProcessPos] == 'H')
+                {
+                    suffix = "&&";
+                    iProcessPos++;
+                }
+                switch (src[iProcessPos])
+                {
+                case 'A':
+                    _strRes = "";
+                    break;
+                case 'B':
+                    _strRes = "const";
+                    break;
+                case 'C':
+                    _strRes = "volatile";
+                    break;
+                case 'D':
+                    _strRes = "const volatile";
+                    break;
+                default:
+                    throw new Exception("Unrecognized CV-Qualifier after G-H " + src[iProcessPos]);
+                }
+                _strRes = _strRes + suffix;
                 break;
             case 'E':
                 _strRes = "__ptr64";
@@ -1249,6 +1273,11 @@ namespace DeMangleVC
                 {
                     iProcessPos++;
                     parseTemplateID(src, ref iProcessPos, ref vType, ref vUiD);
+                }
+                else if (src[iProcessPos] >= 'a' && src[iProcessPos] <='z')
+                {
+                    _strRes = StringComponent.getString(src, ref iProcessPos);
+                    _eUnqualifiedIdType = enumUnqualifiedID.enmIdentifier;
                 }
                 else
                 {

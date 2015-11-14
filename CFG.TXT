@@ -60,17 +60,17 @@ RefTplPara :=
     '$?' QualifiedName VariableType
 
 VariableType :=
-    VarAccMod Type VarCVQ
+    VarAccMod Type CVQVar
 
 VarAccMode :=
     0   // private: static
     3   // normal
 
-VarCVQ :=
-    A   // normal
-    B   // const
-    C   // volatile
-    D   // const volatile
+CVQVar :=
+    'A'		//
+    'B'		// const
+    'C'		// volatile
+    'D'		// const volatile
 
 Type :=
     BaseType        // int
@@ -110,6 +110,8 @@ Func :=
 
 CVQThis :=
     CVQVar
+	'G' CVQVar // &
+	'H' CVQVar // &&
 
 NonMemCVQFunc :=
     6   // normal
@@ -141,9 +143,115 @@ IdentType :=
     MemFuncMod CVQThis FuncP
     ThunkFuncMod ThunkAdjustor CVQThis FuncP
 
+MemFuncMod :=
+	'A'		// private:
+	'C'		// private: static
+	'E'		// private: virtual
+	'I'		// protected:
+	'K'		// protected: static
+	'M'		// protected: virtual
+	'Q'		// public:
+	'S'		// public: static
+	'U'		// public: virtual
+
+ThunkFuncMod :=
+	'G'		// private:
+	'O'		// protected:
+	'W'		// public:
+
+NonMemFuncMod :=
+	'Y'
+
 ThunkAdjustor :=
     IntConst
 
 BaseType :=
     NonVoidType
     'X'         // void
+
+OperatorName :=
+	'?0'	// constructor
+	'?1'	// destructor
+	'?2'	// operator new
+	'?3'	// operator delete
+	'?4'	// operator =
+	'?5'	// operator >>
+	'?6'	// operator <<
+	'?7'	// operator !
+	'?8'	// operator ==
+	'?9'	// operator !=
+	'?A'	// operator []
+    '?B'    // operator type conversion
+    '?C'    // operator ->
+    '?D'    // operator *
+    '?E'    // operator ++
+    '?F'    // operator --
+    '?G'    // operator -
+    '?H'    // operator +
+    '?I'    // operator &
+    '?J'    // operator ->*
+    '?K'    // operator /
+    '?L'    // operator %
+    '?M'    // operator <
+    '?N'    // operator <=
+    '?O'    // operator >
+    '?P'    // operator >=
+    '?Q'    // operator ,
+    '?R'    // operator ()
+    '?S'    // operator ~
+    '?T'    // operator ^
+    '?U'    // operator |
+    '?V'    // operator &&
+    '?W'    // operator ||
+    '?X'    // operator *=
+    '?Y'    // operator +=
+    '?Z'    // operator -=
+	'?_0'   // operator /=
+    '?_1'   // operator %=
+    '?_2'   // operator >>=
+    '?_3'   // operator <<=
+    '?_4'   // operator &=
+    '?_5'   // operator |=
+    '?_6'   // operator ^=
+    '?_7'   // `vftable'
+    '?_8'   // `vbtable'
+    '?_9'   // `vcall'
+    '?_A'   // `typeof'
+    '?_B'   // `local static guard'
+    //'?_C'        "$_C#",    //string constanst
+    '?_D'   // `vbase destructor'
+    '?_E'   // `vector deleting destructor'
+    '?_F'   // `default constructor closure'
+    '?_G'   // `scalar deleting destructor'
+    '?_H'   // `vector constructor iterator'
+    '?_I'   // `vector destructor iterator'
+    '?_J'   // `vector vbase constructor iterator'
+    '?_K'   // `virtual displacement map'
+    '?_L'   // `eh vector constructor iterator'
+    '?_M'   // `eh vector destructor iterator'
+    '?_N'   // `eh vector vbase constructor iterator'
+    '?_O'   // `copy constructor closure'
+    //'?_P'        "_P",
+    //'?_Q'        "_Q",
+    '?_R0' Type			// `RTTI Type Descriptor'
+	'?_R1' IntConst{4}	// `RTTI Base Class Descriptor'
+	'?_R2'				// `RTTI Base Class Array'
+	'?_R3'              // `RTTI Class Hierarchy Descriptor'
+	'?_R4'				// `RTTI Complete Object Locator'
+    '?_S'    // `local vftable'
+    '?_T'    // `local vftable constructor closure'
+    '?_U'    // operator new[]
+    '?_V'    // operator delete[]
+    //'?_W'        "_W",
+    '?_X'    // `placement delete closure'
+    '?_Y'    // `placement delete[] closure'
+    //'?_Z'        "_Z"
+	'?__A'   // `managed vector constructor iterator'
+    '?__B'   // `managed vector destructor iterator'
+    '?__C'   // `eh vector copy constructor iterator'
+    '?__D'   // `eh vector vbase copy constructor iterator'
+    '?__E' Ident		// `dynamic initializer for '.''
+	'?__E' StringName   // `dynamic initializer for '.''
+    '?__F' Ident		// `dynamic atexit destructor for '.''
+	'?__F' StringName	// `dynamic atexit destructor for '.''
+    '?__G'   // `vector copy constructor iterator'

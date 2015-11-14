@@ -1,3 +1,11 @@
+public: int __thiscall A::fxunc(void)&
+public: int __thiscall A::fxunc(void)const&
+public: int __thiscall A::fxunc(void)volatile&
+public: int __thiscall A::fxunc(void)const volatile&
+public: int __thiscall A::fxunc(void)&&
+public: int __thiscall A::fxunc(void)const&&
+public: int __thiscall A::fxunc(void)volatile&&
+public: int __thiscall A::fxunc(void)const volatile&&
 struct boost::re_detail::digraph<wchar_t> * __cdecl std::_Move_backward_opt<struct boost::re_detail::digraph<wchar_t> *,struct boost::re_detail::digraph<wchar_t> *,struct std::random_access_iterator_tag,struct std::_Undefined_move_tag>(struct boost::re_detail::digraph<wchar_t> *,struct boost::re_detail::digraph<wchar_t> *,struct boost::re_detail::digraph<wchar_t> *,struct std::random_access_iterator_tag,struct std::_Undefined_move_tag,struct std::_Range_checked_iterator_tag)
 public: int __thiscall boost::_bi::bind_t<int,class boost::_mfi::cmf7<int,class std::codecvt<wchar_t,char,int>,int &,wchar_t const *,wchar_t const *,wchar_t const * &,char *,char *,char * &>,class boost::_bi::list8<class boost::_bi::value<class std::codecvt<wchar_t,char,int> const *>,class boost::arg<1>,class boost::arg<2>,class boost::arg<3>,class boost::arg<4>,class boost::arg<5>,class boost::arg<6>,class boost::arg<7> > >::operator() <int,wchar_t const *,wchar_t const *,wchar_t const *,char [32],char *,char *>(int &,wchar_t const * &,wchar_t const * &,wchar_t const * &,char (&)[32],char * &,char * &)
 class std::bad_alloc `RTTI Type Descriptor'
