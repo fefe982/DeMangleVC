@@ -1,5 +1,6 @@
 Ident :=
     '?' QualifiedName IdentType
+    '?' '?' "[_a-zA-Z][_0-9a-zA-Z]*" '$initializer$@' NameQualifier '@' '2P6AXXZA' '@@3P6AXXZA'
 
 QualifiedName :=
     BaseName '@'

@@ -367,7 +367,7 @@ namespace DeMangleVC
             "_R",
             "char16_t",
             "_T",
-            "_U",
+            "char32_t",
             "_V",
             "wchar_t",
             "_X",
@@ -465,6 +465,7 @@ namespace DeMangleVC
                 case 'M':
                 case 'N':
                 case 'S':
+                case 'U':
                 case 'W':
                     retType = new TypeSimple(strType_[src[iProcessPos] - 'A']);
                     iProcessPos++;
@@ -1280,10 +1281,17 @@ namespace DeMangleVC
                     iProcessPos++;
                     parseTemplateID(src, ref iProcessPos, ref vType, ref vUiD);
                 }
-                else if (src[iProcessPos] >= 'a' && src[iProcessPos] <='z')
+                else if (iProcessPos == 2 && src.IndexOf("$initializer$") != -1) // special cases, for $initializer$
                 {
-                    _strRes = StringComponent.getString(src, ref iProcessPos);
+                    iProcessPos--;
+                    _strRes = new Declaration().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+                    _strRes = "`" + _strRes + "'";
                     _eUnqualifiedIdType = enumUnqualifiedID.enmIdentifier;
+                    if (src[iProcessPos] != '@')
+                    {
+                        throw new Exception("Error $initializer$ sequence");
+                    }
+                    iProcessPos++;
                 }
                 else
                 {
