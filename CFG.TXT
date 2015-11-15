@@ -1,6 +1,7 @@
 Ident :=
     '?' QualifiedName IdentType
     '?' '?' "[_a-zA-Z][_0-9a-zA-Z]*" '$initializer$@' NameQualifier '@' '2P6AXXZA' '@@3P6AXXZA'
+    StringLiteral
 
 QualifiedName :=
     BaseName '@'
@@ -258,3 +259,34 @@ OperatorName :=
 	'?__F' StringName	// `dynamic atexit destructor for '.''
     '?__G'   // `vector copy constructor iterator'
 	'?__K' StringName   // user define literal operators
+
+StringLiteral :=
+    '??_C@' StringLiteralType '_' LiteralLength LiteralUID LiteralContent
+
+StringLiteralType :=
+    '_0'    // char, char16_t, char32_t
+    '_1'    // wchat_t
+
+LiteralLength :=
+    IntConst
+
+LiteralUID :=
+    IntConst    // exact 8 digits
+
+LiteralContent :=
+    LiteralChar '@'
+    LiteralChar LiteralContent
+
+LiteralChar :=
+    '?$' "[A-F]{2}"     // to digit hex
+    '?0'    // ,
+    '?1'    // /
+    '?2'    // \
+    '?3'    // :
+    '?4'    // .
+    '?5'    // space
+    '?6'    // \n
+    '?7'    // \t
+    '?8'    // '
+    '?9'    // -
+    "[$0-9A-Za-z_]" // as is

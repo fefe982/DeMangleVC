@@ -1,3 +1,4 @@
+`string'[5]{24932327} "test\x00"
 void (__cdecl * `public: static void (__cdecl * std::numpunct<char>::id$initializer$)(void)')(void)
 class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > __cdecl operator "" _w(char16_t const *,unsigned int)
 public: int __thiscall A::fxunc(void)&

@@ -1713,6 +1713,11 @@ namespace DeMangleVC
             if (uIDBaseID.eUnqualifiedIdType == UnqualifiedID.enumUnqualifiedID.enmString)
             {
                 _strRes = uIDBaseID.getDemangledString();
+                if (src[iProcessPos] != '@')
+                {
+                    throw new Exception("Error String Literal, not @ after _C");
+                }
+                iProcessPos++;
             }
             else
             {
@@ -1726,6 +1731,79 @@ namespace DeMangleVC
                 _strRes = nnsQualifier.getDemangledString() + uIDBaseID.getDemangledString();
             }
             saveParseStatus(src, pos, iProcessPos);
+            pos = iProcessPos;
+            return this;
+        }
+    }
+
+    class StringLiteral : StringComponent
+    {
+        private static String[] shortString = { ",", "/", "\\\\", ":", ".", " ", "\\n", "\\t", "'", "-"};
+        public override ParseBase parse(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
+        {
+            int iProcessPos = pos;
+            if (src[iProcessPos] != '_' || (src[iProcessPos + 1] != '0' && src[iProcessPos + 1] != '1'))
+            {
+                throw new Exception("Wrong String Literal Type" + src[iProcessPos] + src[iProcessPos + 1]);
+            }
+            iProcessPos += 2;
+            long length = getInteger(src, ref iProcessPos);
+            long uid = getInteger(src, ref iProcessPos);
+            _strRes = "[" + length.ToString() + "]{" + String.Format("{0:X8}", uid) + "} \"";
+            long clen = 0;
+            while (src[iProcessPos] != '@')
+            {
+                if (src[iProcessPos] == '?')
+                {
+                    iProcessPos++;
+                    if (src[iProcessPos] == '$')
+                    {
+                        iProcessPos++;
+                        int val = (src[iProcessPos] - 'A') * 16 + (src[iProcessPos + 1] - 'A');
+                        if (val == 34)
+                        {
+                            _strRes += "\\\"";
+                        }
+                        else if (val > 32 && val < 127)
+                        {
+                            _strRes += (char)val;
+                        }
+                        else if (val == 13)
+                        {
+                            _strRes += "\\r";
+                        }
+                        else
+                        {
+                            _strRes += "\\x" + String.Format("{0:X2}", val);
+                        }
+                        iProcessPos += 2;
+                    }
+                    else if (src[iProcessPos] >= '0' && src[iProcessPos] <= '9')
+                    {
+                        _strRes += shortString[src[iProcessPos] - '0'];
+                        iProcessPos++;
+                    }
+                    else
+                    {
+                        throw new Exception("Error in String literal");
+                    }
+                }
+                else
+                {
+                    _strRes += src[iProcessPos];
+                    iProcessPos++;
+                }
+                clen++;
+            }
+            if (clen < length)
+            {
+                _strRes += "...";
+            }
+            else
+            {
+                _strRes += "\"";
+            }
+            iProcessPos++;
             pos = iProcessPos;
             return this;
         }
@@ -1747,7 +1825,7 @@ namespace DeMangleVC
             if (qID.getDemangledString() == "$_C#")
             {
                 sIdent = "`string'";
-                iProcessPos = src.Length;
+                sIdent += new StringLiteral().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
             }
             else if (Char.IsDigit(src[iProcessPos])) // variable
             {
