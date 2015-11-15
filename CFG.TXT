@@ -1,6 +1,11 @@
 Ident :=
     '?' QualifiedName IdentType
-    '?' '?' "[_a-zA-Z][_0-9a-zA-Z]*" '$initializer$@' NameQualifier '@' '2P6AXXZA' '@@3P6AXXZA'
+    '?' QualifiedName IdentType Ident // ??_7 , `vftable'; ??_8 `vbtable'; ??_R4 `RTTI Complete Object Locator'
+    '?' QualifiedName IdentType IntConst // ::__LINE__Var
+    '?' QualifiedName '$4' IntConst IntConst CVQThis FuncP  // [thunk] `vtordisp'
+    '?' QualifiedNmae '$A' Type 'A' // [thunk] `local static destructor helper'
+    '?' QualifiedNmae '$B' IntConst 'AE' // [thunk] 
+    '??' "[_a-zA-Z][_0-9a-zA-Z]*" '$initializer$@' NameQualifier '@' '2P6AXXZA' '@@3P6AXXZA'
     StringLiteral
 
 QualifiedName :=
@@ -144,7 +149,6 @@ IdentType :=
     VariableType
     NonMemFuncMod FuncP
     MemFuncMod CVQThis FuncP
-    ThunkFuncMod ThunkAdjustor CVQThis FuncP
 
 MemFuncMod :=
 	'A'		// private:
