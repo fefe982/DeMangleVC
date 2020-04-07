@@ -70,10 +70,21 @@ RefTplPara :=
 
 VariableType :=
     VarAccMode Type CVQVar
+    '5' IntConst            // local static guard
+    '6B@'                   // vftable
+    '6B' QualifiedName '@'  // vftable for QualifiedName
+    '7B@'                   // vbtable
+    '7B' QualifiedName '@'  // vbtable for QualifiedName
+    '8'                     // RTTI Type Descriptor
+    '9'                     // used for the function name for local scope static variable
+
 
 VarAccMode :=
     0   // private: static
+    1   // protected: static
+    2   // public: static
     3   // normal
+    4   // function scope static variable
 
 CVQVar :=
     'A'     //

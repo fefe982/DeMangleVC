@@ -160,3 +160,4 @@ FakesAssemblies/
 *.opt
 
 /_test
+/.vscode
