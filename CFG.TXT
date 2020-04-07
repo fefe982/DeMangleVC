@@ -55,6 +55,7 @@ TplPara :=
     Type    // template template parameter is not distingushable with type template parameter
     IntTplPara
     RefTplPara
+    PointerTplPara
 
 IntTplPara :=
     '$0' IntConst
@@ -67,6 +68,9 @@ IntConst :=
 
 RefTplPara :=
     '$?' QualifiedName VariableType
+
+PointerTplPara :=
+    '?1' QualifiedName VariableType
 
 VariableType :=
     VarAccMode Type CVQVar
