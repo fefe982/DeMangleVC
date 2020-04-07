@@ -1751,6 +1751,7 @@ namespace DeMangleVC
             long uid = getInteger(src, ref iProcessPos);
             _strRes = "[" + length.ToString() + "]{" + String.Format("{0:X8}", uid) + "} \"";
             long clen = 0;
+            int lastChar = -1;
             while (src[iProcessPos] != '@')
             {
                 if (src[iProcessPos] == '?')
@@ -1760,6 +1761,7 @@ namespace DeMangleVC
                     {
                         iProcessPos++;
                         int val = (src[iProcessPos] - 'A') * 16 + (src[iProcessPos + 1] - 'A');
+                        lastChar = val;
                         if (val == 34)
                         {
                             _strRes += "\\\"";
@@ -1780,6 +1782,7 @@ namespace DeMangleVC
                     }
                     else if (src[iProcessPos] >= '0' && src[iProcessPos] <= '9')
                     {
+                        lastChar = -1;
                         _strRes += shortString[src[iProcessPos] - '0'];
                         iProcessPos++;
                     }
@@ -1790,21 +1793,28 @@ namespace DeMangleVC
                 }
                 else
                 {
+                    lastChar = src[iProcessPos];
                     _strRes += src[iProcessPos];
                     iProcessPos++;
                 }
                 clen++;
             }
-            if (clen < length)
-            {
-                _strRes += "...";
-            }
-            else
+            // lower version of VS will encode the last '\0' into the mangled name, but 
+            // recent versions won't
+            if (clen == length || (clen + 1 == length && lastChar != 0))
             {
                 _strRes += "\"";
             }
+            else
+            {
+                _strRes += "...";
+            }
             iProcessPos++;
             pos = iProcessPos;
+#if REFINE__ 
+#else // UnDecorateSymbolName will not output the lenth and content part of string literal
+            _strRes = "";
+#endif
             return this;
         }
     }

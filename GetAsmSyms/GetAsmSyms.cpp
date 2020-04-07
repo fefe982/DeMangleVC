@@ -4,7 +4,7 @@
 #include <regex>
 #include <map>
 
-std::regex regexSymbol("(\\?[^ \\t]+) .*(?:; (.+))?$");
+std::regex regexSymbol(R"((?:^|\s)(\?[^\s]+)\s.*(?:;\s*(.+))?$)");
 
 int main(int argc, char **argv)
 {
