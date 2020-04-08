@@ -1,10 +1,10 @@
 Ident :=
     '?' QualifiedName IdentType
-    '?' QualifiedName IdentType Ident // ??_7 , `vftable'; ??_8 `vbtable'; ??_R4 `RTTI Complete Object Locator'
-    '?' QualifiedName IdentType IntConst // ::__LINE__Var
+    '?' QualifiedName IdentType IntConst    // ::__LINE__Var
     '?' QualifiedName '$4' IntConst IntConst CVQThis FuncP  // [thunk] `vtordisp'
-    '?' QualifiedNmae '$A' Type 'A' // [thunk] `local static destructor helper'
-    '?' QualifiedNmae '$B' IntConst 'AE' // [thunk] 
+    '?' QualifiedName '$A' Type 'A'         // [thunk] `local static destructor helper'
+    '?' QualifiedName '$B' IntConst 'AE'    // [thunk] `vcall'
+    '?' QualifiedName '$C' QualifiedName    // `virtual displacement map'
     '??' "[_a-zA-Z][_0-9a-zA-Z]*" '$initializer$@' NameQualifier '@' '2P6AXXZA' '@@3P6AXXZA'
     StringLiteral
 
@@ -154,12 +154,13 @@ ParamList :=
     NonVoidParamList
 
 NonVoidParamList :=
-    NonVoidType '@'
-    NonVoidType 'Z'         // Z stands for ,... here
-    NonVoidType NonVoidParamList
+    Type '@'
+    'Z'                     // Z stands for ,... here, also used for empty exception specifier
+    Type NonVoidParamList
 
 RetType :=
     Type
+    '@'     // no return type, for functions like contructors, destructors
 
 IdentType :=
     VariableType
