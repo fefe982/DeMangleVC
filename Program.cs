@@ -1890,45 +1890,54 @@ namespace DeMangleVC
             else
             {
                 if (src[iProcessPos] == '$')
-                {   // currently we only meet this in vcall
+                {
                     long val;
                     iProcessPos++;
                     switch (src[iProcessPos])
                     {
-                    case '4':
-                        {   // [thunk], `vector deleting destructor'
+                        case '4':
+                            {   // [thunk], `vector deleting destructor'
+                                iProcessPos++;
+                                long val1 = StringComponent.getInteger(src, ref iProcessPos);
+                                long val2 = StringComponent.getInteger(src, ref iProcessPos);
+                                String sModifier = "[thunk]:public: virtual ";
+                                TypeFunctionBase func = new TypeFunctionBase(true);
+                                func.parse(src, ref iProcessPos, ref vType, ref vUiD);
+                                String sFuncBody = func.getDeclaration(qID.getDemangledString() + "`vtordisp{" + val1 + "," + val2 + "}' ");
+                                sIdent = sModifier + sFuncBody;
+                                break;
+                            }
+                        case 'A': // local static destructor helper
                             iProcessPos++;
-                            long val1 = StringComponent.getInteger(src, ref iProcessPos);
-                            long val2 = StringComponent.getInteger(src, ref iProcessPos);
-                            String sModifier = "[thunk]:public: virtual ";
-                            TypeFunctionBase func = new TypeFunctionBase(true);
-                            func.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                            String sFuncBody = func.getDeclaration(qID.getDemangledString() + "`vtordisp{" + val1 + "," + val2 + "}' ");
-                            sIdent = sModifier + sFuncBody;
+                            Type sRetType = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD, true);
+                            if (src[iProcessPos] != 'A')
+                            {
+                                throw new Exception();
+                            }
+                            sIdent = "[thunk]:" + sRetType.getDeclaration(qID.getDemangledString() + "`local static destructor helper\'");
+                            iProcessPos++;
                             break;
-                        }
-                    case 'A':
-                        iProcessPos++;
-                        Type sRetType = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD, true);
-                        if (src[iProcessPos] != 'A')
-                        {
+                        case 'B': // vcall
+                            iProcessPos++;
+                            val = StringComponent.getInteger(src, ref iProcessPos);
+                            if (src.Substring(iProcessPos, 2) != "AE")
+                            {
+                                throw new Exception();
+                            }
+                            sIdent = "[thunk]: __thiscall " + qID.getDemangledString() + "{" + val.ToString() + ",{flat}}' }'";
+                            iProcessPos += 2;
+                            break;
+                        case 'C': // virtual desplacement map
+                            {
+                                iProcessPos++;
+                                QualifiedID qIDFor = new QualifiedID();
+                                qIDFor.parse(src, ref iProcessPos, ref vType, ref vUiD);
+
+                                sIdent = qID.getDemangledString() + "{for " + qIDFor.getDemangledString() + "}";
+                            }
+                            break;
+                        default:
                             throw new Exception();
-                        }
-                        sIdent = "[thunk]:" + sRetType.getDeclaration(qID.getDemangledString() + "`local static destructor helper\'");
-                        iProcessPos++;
-                        break;
-                    case 'B':
-                        iProcessPos++;
-                        val = StringComponent.getInteger(src, ref iProcessPos);
-                        if (src.Substring(iProcessPos, 2) != "AE")
-                        {
-                            throw new Exception();
-                        }
-                        sIdent = "[thunk]: __thiscall " + qID.getDemangledString() + "{" + val.ToString() + ",{flat}}' }'";
-                        iProcessPos += 2;
-                        break;
-                    default:
-                        throw new Exception();
                     }
                 }
                 else
