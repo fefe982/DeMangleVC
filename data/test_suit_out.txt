@@ -39,3 +39,4 @@ class AAA<> aa
 class BBB<> bb
 char (* `main'::`2'::c)[10]
 char const (* const `main'::`2'::d)[10]
+`anonymous namespace'::B::`virtual displacement map'{for `anonymous namespace'::C}
