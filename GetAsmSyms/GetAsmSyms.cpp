@@ -4,7 +4,7 @@
 #include <regex>
 #include <map>
 
-std::regex regexSymbol(R"((?:^|\s)(\?[^\s]+)\s.*(?:;\s*(.+))?$)");
+std::regex regexSymbol(R"((?:^|\s)(\?[^\s:,]+)[\s:].*?(?:;\s*(.+))?$)");
 
 int main(int argc, char **argv)
 {
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
             while (std::getline(isAsm, line))
             {
                 std::smatch sm;
-                if (std::regex_search(line, sm, regexSymbol, std::regex_constants::match_continuous))
+                if (std::regex_search(line, sm, regexSymbol))
                 {
                     if (sm.size() == 3)
                     {
