@@ -263,3 +263,16 @@ Used to replace the `vftable` for object of `dllimport`ed class created by `new`
 The `vector deleting destructor` is put into the `vftable` if the destructor is virtual, can it calls `operator delete`. However, for `dllimport`ed classes, the `operator delete` inside the DLL (which is called by the `vector deleting destructor` in the DLL) may not be the same with the one in the exe. It may not match the `operator new` in the EXE, which may cause problems. To resolve this, for these classes, a `local vftable` is generated to replace the original `vftable` in the object, after normal object construct in the EXE. In the `local vftable`, the destructor calls the `operator delete` in the EXE.
 
 Details see [here](https://groups.google.com/forum/#!msg/microsoft.public.vc.language/atSh_2VSc2w/EgJ3r_7OzVUJ).
+
+## `local vftable constructor closure`
+
+`??_TIMPClass@@QAEXXZ`
+
+``public: void __thiscall IMPClass::`local vftable constructor closure'(void)``
+
+It is used to wrap up the normal construct steps and the replacement of `local vftable`.
+
+
+## `placement delete closure` `placement delete[] closure`
+
+Need more information.
