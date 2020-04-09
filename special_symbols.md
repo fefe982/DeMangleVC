@@ -2,27 +2,27 @@
 
 ## `vftable`
 
-`??_7***6B@`
+`??_7vbase@@6B@`
 
-``const {0}::`vftable'``
+``const vbase::`vftable'``
 
-`??_7***6B***@`
+`??_7three@@6Bone@@@`
 
-``const {0}::`vftable'{for `{1}'}``
+``const three::`vftable'{for `one'}``
 
-The virtual function table. Collection of addresses for the final overload of all the virtual functions within a class.
+The virtual function table. The first entry is the `RTTI Complete Object Locator`, and the rest is the collection of addresses for the final overload of all the virtual functions within a class.
 
 If there is multiple inheritance, and there is a need to generate a vftable for each of the bases, there will be a "for" part in this symbol, naming each of the bases needed.
 
 ## `vbtable`
 
-`??_8***7B@`
+`??_8X@@7B@`
 
-``const {0}::`vbtable'``
+``const X::`vbtable'``
 
-`??_8***7B***@`
+`??_8three@@7Bone@@@`
 
-``const {0}::`vbtable'{for `{1}'}``
+``const three::`vbtable'{for `one'}``
 
 The virtual base table, contains informaion for virtual bases.
 
@@ -30,7 +30,7 @@ If there is multiple inheritance, the vbtable may be generated for each of the v
 
 ## `vcall`
 
-`??_9***$B3AE`
+`??_9vbase@@$B3AE`
 
 ``[thunk]: __thiscall vbase::`vcall'{4,{flat}}' }'``
 
@@ -52,9 +52,9 @@ However, I cannot produce this symbol now. Instead, "noraml" local variables wit
 
 ## `vbase destructor`
 
-`??_D***UAE@XZ`
+`??_DAA@@QAEXXZ`
 
-``public: void __thiscall {0}::`vbase destructor'(void)``
+``public: void __thiscall AA::`vbase destructor'(void)``
 
 Generated destructor wrapper for classes with virtual bases.
 
@@ -62,11 +62,15 @@ For classes which has virtual bases, the "normal" destructor function generated 
 
 ## `vector deleting destructor`
 
-`??_E***QAEPAXI@Z`
+`??_Efour@@UAEPAXI@Z`
 
-``public: void * __thiscall {0}::`vector deleting destructor'(unsigned int)``
+``public: virtual void * __thiscall four::`vector deleting destructor'(unsigned int)``
 
-Generated function for `delete[]` expression, and can be put into the `vftable` if the destructor is virtual.
+`??_Efour@@$4PPPPPPPM@A@AEPAXI@Z`
+
+``[thunk]:public: virtual void * __thiscall four::`vector deleting destructor'`vtordisp{-4,0}' (unsigned int)``
+
+Generated function for `delete[]` expression, and can be put into the `vftable` if the destructor is virtual. When it is put into the `vftable`, it may need a thunk ot adjust the `this` pointer. The thunk is the second version of the example above.
 
 It calls the destructors of every element, then calls `operator delete[]` or `operator delete` to release the memory.
 
@@ -74,9 +78,9 @@ The parameter is a flag which determines where to destruct one or all elementer,
 
 ## `default constructor closure`
 
-`??_F***QAEXXZ`
+`??_Fvbase@@QAEXXZ`
 
-``void __thiscall {0}::`default constructor closure'(void)``
+``public: void __thiscall vbase::`default constructor closure'(void)``
 
 Generated function that takes no parameter, and wraps a default constructor whose paramters all has default value.
 
@@ -85,9 +89,9 @@ In the latter case, when a default constructor with no parameters is needed by t
 
 ## `scalar deleting destructor`
 
-`??_G***UAEPAXI@Z`
+`??_Gtwo@@UAEPAXI@Z`
 
-``public: void * __thiscall {0}::`scalar deleting destructor'(unsigned int)``
+``public: virtual void * __thiscall two::`scalar deleting destructor'(unsigned int)``
 
 Generated wrap function for `delete` expresion or explicte destructor call, calls destructor and (optionally) `operator delete`.
 
@@ -140,9 +144,9 @@ parameters:
 
 ## `virtual displacement map`
 
-`??_K***$C***`
+`??_KB@x@@$CC@1@`
 
-``{0}::`virtual displacement map'{for {1}}``
+``x::B::`virtual displacement map'{for x::C}``
 
 It is helper structure which helps casting between pointer to member functions in the two classes. Usually multiple inheritance / virtual function / virtual bases are involved.
 
@@ -190,3 +194,72 @@ parameters:
 2. `unsigned int`: size of one object
 3. `unsigned int`: number of objects
 4. `void * (__thiscall*)(void *)`: pointer to the constructor
+
+## `copy constructor closure`
+
+`??_OTestClassA@@QAEXAAV0@@Z`
+
+``public: void __thiscall TestClassA::`copy constructor closure'(class TestClassA &)``
+
+Generated copy contructor, and wraps the actually which has more parameters, but all but the first have default values.
+
+The copy constructor in C++ has only one parameter, or all but the first paramter have default argument.
+In the latter case, when a copy constructor with only one parameters is needed by the compiler, a `copy constructor closure` is generated to wrap up the original constructor.
+
+## `RTTI Type Descriptor`
+
+`??_R0?AUbase@@@8`
+
+``struct base `RTTI Type Descriptor'``
+
+A struct (of type `std::type_info`) that contains the runtime type information.
+
+## `RTTI Base Class Descriptor`
+
+`??_R1A@?0A@EA@four@@8`
+
+``four::`RTTI Base Class Descriptor at (0,-1,0,64)'``
+
+A structure that describe a base class object. The data contains `RTTI Type Descriptor` of the base class, number of bases that base has, offset of the base class object (`vftable`), an atribute, and the `RTTI Class Hierarchy Descriptor`.
+
+The numbers mangled in the name is the offset (first three numbers) and attribute.
+
+## `RTTI Base Class Array`
+
+`??_R2four@@8`
+
+``four::`RTTI Base Class Array'``
+
+An array of `RTTI Base Class Descriptor` for all (direct and inderect) base classes. The first entry is the class itself.
+
+## `RTTI Class Hierarchy Descriptor`
+
+`??_R3four@@8`
+
+``four::`RTTI Class Hierarchy Descriptor'``
+
+A structure describes class dierarchy. It contains attribute that shows multiple / virtual inheritance, count of bases classes (including self), and `RTTI Base Class Array`.
+
+## `RTTI Complete Object Locator`
+
+`??_R4base@@6B@`
+
+``const base::`RTTI Complete Object Locator'``
+
+`??_R4two@@6Bvbase@@@`
+
+``const two::`RTTI Complete Object Locator'{for `vbase'}``
+
+This structure contains information about the offset of the class within the complete class object, and the `RTTI Type Descriptor`, `RTTI Class Hierarchy Descriptor` for the compelete object.
+
+## `local vftable`
+
+`??_SIMPClass@@6B@`
+
+``const IMPClass::`local vftable'``
+
+Used to replace the `vftable` for object of `dllimport`ed class created by `new`.
+
+The `vector deleting destructor` is put into the `vftable` if the destructor is virtual, can it calls `operator delete`. However, for `dllimport`ed classes, the `operator delete` inside the DLL (which is called by the `vector deleting destructor` in the DLL) may not be the same with the one in the exe. It may not match the `operator new` in the EXE, which may cause problems. To resolve this, for these classes, a `local vftable` is generated to replace the original `vftable` in the object, after normal object construct in the EXE. In the `local vftable`, the destructor calls the `operator delete` in the EXE.
+
+Details see [here](https://groups.google.com/forum/#!msg/microsoft.public.vc.language/atSh_2VSc2w/EgJ3r_7OzVUJ).
