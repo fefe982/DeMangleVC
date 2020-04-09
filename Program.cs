@@ -1847,7 +1847,7 @@ namespace DeMangleVC
                     switch (src[iProcessPos])
                     {
                     default:
-                        if (qID.getDemangledString().EndsWith("::`vftable'") || qID.getDemangledString().EndsWith("::`vbtable'") || qID.getDemangledString().EndsWith("::`RTTI Complete Object Locator'"))
+                        if (qID.getDemangledString().EndsWith("::`vftable'") || qID.getDemangledString().EndsWith("::`vbtable'") || qID.getDemangledString().EndsWith("::`RTTI Complete Object Locator'") || qID.getDemangledString().EndsWith("::`local vftable'"))
                         {
                             if (src[iProcessPos] != '@')
                             {
@@ -1899,6 +1899,12 @@ namespace DeMangleVC
                             {   // [thunk], `vector deleting destructor'
                                 iProcessPos++;
                                 long val1 = StringComponent.getInteger(src, ref iProcessPos);
+#if REFINE__ // This is actually a possible minus offset repsented in unsigned integer
+                                if (val1 > 0x80000000)
+                                {
+                                    val1 = val1 - 0x100000000;
+                                }
+#endif
                                 long val2 = StringComponent.getInteger(src, ref iProcessPos);
                                 String sModifier = "[thunk]:public: virtual ";
                                 TypeFunctionBase func = new TypeFunctionBase(true);
