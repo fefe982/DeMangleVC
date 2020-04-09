@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GenNames.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="vftable_vbtable_RTTI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

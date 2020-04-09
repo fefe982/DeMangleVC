@@ -93,7 +93,6 @@
     <ClCompile Include="generated_ctor_dtor_noeh.cpp">
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExceptionHandling>
     </ClCompile>
-    <ClCompile Include="GenNames.cpp" />
     <ClCompile Include="local_vftable.cpp" />
     <ClCompile Include="placement_delete_closure.cpp" />
     <ClCompile Include="vftable_vbtable_RTTI.cpp" />
