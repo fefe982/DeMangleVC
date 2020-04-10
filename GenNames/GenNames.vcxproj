@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dynamic_init_dtor.cpp" />
     <ClCompile Include="generated_ctor_dtor.cpp" />
     <ClCompile Include="generated_ctor_dtor_noeh.cpp">
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExceptionHandling>
