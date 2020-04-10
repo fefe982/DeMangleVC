@@ -1,1 +1,1 @@
-..\debug\GetAsmSyms.exe ..\GenNames\Debug\GenNames.asm > ..\_test\sym_names.txt
+..\debug\GetAsmSyms.exe ..\GenNames\Debug\ > ..\_test\sym_names.txt
