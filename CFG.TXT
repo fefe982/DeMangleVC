@@ -146,6 +146,19 @@ MemCVQFunc :=
 FuncP :=
     CallConv RetType ParamList ThrowParamList
 
+CallConv :=
+    'A'     // __cdecl
+    'B'     // __cdecl
+    'C'     // __pascal
+    'D'     // __pascal
+    'E'     // __thiscall
+    'F'     // __thiscall
+    'G'     // __stdcall
+    'H'     // __stdcall
+    'I'     // __fastcall
+    'J'     // __fastcall
+    'M'     // __clrcall
+
 ThrowParamList: =
     ParamList
 
@@ -279,6 +292,7 @@ OperatorName :=
     '?__F' Ident        // `dynamic atexit destructor for '.''
     '?__F' StringName   // `dynamic atexit destructor for '.''
     '?__G'              // `vector copy constructor iterator'
+    '?__H'              // `vector vbase copy constructor iterator'
     '?__K' StringName   // user define literal operators
 
 StringLiteral :=

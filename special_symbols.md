@@ -103,7 +103,7 @@ The flag parameter controls where `operator delete` should be called.
 
 ``void __stdcall `vector constructor iterator'(void *,unsigned int,int,void * (__thiscall*)(void *))``
 
-Global function to construct an array of class objects.
+Library function to construct an array of class objects.
 
 parameters:
 
@@ -118,7 +118,7 @@ parameters:
 
 ``void __stdcall `vector destructor iterator'(void *,unsigned int,unsigned int,void (__thiscall *)(void *))``
 
-Global function to destruct an array of class objects.
+Library function to destruct an array of class objects.
 
 paramters:
 
@@ -133,7 +133,7 @@ paramters:
 
 ``void __stdcall `vector vbase constructor iterator'(void *,unsigned int,unsigned int,void * (__thiscall *)(void *))``
 
-Global function to construct an array of class objects with virtual bases. Genterated constructor function for classes with virtual bases has a hidden paramter `_$initVBases$`, which controls where the virtual base should be initialized in the contrusctor. So the iterator function is different from `vector constructor iterator`.
+Library function to construct an array of class objects with virtual bases. Genterated constructor function for classes with virtual bases has a hidden paramter `_$initVBases$`, which controls where the virtual base should be initialized in the contrusctor. So the iterator function is different from `vector constructor iterator`.
 
 parameters:
 
@@ -156,7 +156,7 @@ It is helper structure which helps casting between pointer to member functions i
 
 ``void __stdcall `eh vector constructor iterator'(void *,unsigned int,int,void (__thiscall *)(void *),void (__thiscall *)(void *))``
 
-Global function to construct an array of class objects, with execption handling.
+Library function to construct an array of class objects, with execption handling.
 paramters:
 
 1. `void *`: starting address of the array
@@ -171,7 +171,7 @@ paramters:
 
 ``void __stdcall `eh vector destructor iterator'(void *,unsigned int,int,void (__thiscall *)(void *))``
 
-Global function to destruct an array of class objects, with exception handling
+Library function to destruct an array of class objects, with exception handling
 
 paramters:
 
@@ -186,7 +186,7 @@ paramters:
 
 ``void __stdcall `eh vector vbase constructor iterator'(void *,unsigned int,int,void (__thiscall*)(void *),void (__thiscall*)(void *))``
 
-Global function to construct an array of class objects with virtual bases, with exception handling. Genterated constructor function for classes with virtual bases has a hidden paramter `_$initVBases$`, which controls where the virtual base should be initialized in the contrusctor. So the iterator function is different from `vector constructor iterator`.
+Library function to construct an array of class objects with virtual bases, with exception handling. Genterated constructor function for classes with virtual bases has a hidden paramter `_$initVBases$`, which controls where the virtual base should be initialized in the contrusctor. So the iterator function is different from `vector constructor iterator`.
 
 parameters:
 
@@ -272,7 +272,72 @@ Details see [here](https://groups.google.com/forum/#!msg/microsoft.public.vc.lan
 
 It is used to wrap up the normal construct steps and the replacement of `local vftable`.
 
-
 ## `placement delete closure` `placement delete[] closure`
 
 Need more information.
+
+## `eh vector copy constructor iterator`
+
+`??__C@YGXPAX0IIP6EX00@ZP6EX0@Z@Z`
+
+``void __stdcall `eh vector copy constructor iterator'(void *,void *,unsigned int,unsigned int,void (__thiscall *)(void *,void *),void (__thiscall *)(void *))``
+
+Library function to copy construct an array of class objects.
+
+Parameter:
+
+1. `void *`: Destination array address
+2. `void *`: Source array address
+3. `unsigned int`: size of an object
+4. `unsigned int`: number of objects in the array
+5. `void (__thiscall *)(void *,void *)`: copy constructor of the class
+6. `void (__thiscall *)(void *)`: destructor of the class
+
+## `eh vector vbase copy constructor iterator`
+
+`??__D@YGXPAX0IIP6EX00@ZP6EX0@Z@Z`
+
+``void __stdcall `eh vector vbase copy constructor iterator'(void *,void *,unsigned int,unsigned int,void (__thiscall *)(void *,void *),void (__thiscall *)(void *))``
+
+Library function to copy construct an array of class objects, for class with virtual bases.
+
+Parameter:
+
+1. `void *`: Destination array address
+2. `void *`: Source array address
+3. `unsigned int`: size of an object
+4. `unsigned int`: number of objects in the array
+5. `void (__thiscall *)(void *,void *)`: copy constructor of the class
+6. `void (__thiscall *)(void *)`: destructor of the class
+
+## `vector copy constructor iterator`
+
+`??__G@YGXPAX0IIP6EPAX00@Z@Z`
+
+``void __stdcall `vector copy constructor iterator'(void *,void *,unsigned int,unsigned int,void * (__thiscall *)(void *,void *))``
+
+Library function to copy construct an array of class objects, without exception handling
+
+Parameter:
+
+1. `void *`: Destination array address
+2. `void *`: Source array address
+3. `unsigned int`: size of an object
+4. `unsigned int`: number of objects in the array
+5. `void (__thiscall *)(void *,void *)`: copy constructor of the class
+
+## `vector vbase copy constructor iterator`
+
+`??__H@YGXPAX0IIP6EPAX00@Z@Z`
+
+``void __stdcall `vector vbase copy constructor iterator'(void *,void *,unsigned int,unsigned int,void * (__thiscall *)(void *,void *))``
+
+Library function to copy construct an array of class objects, for class with virtual bases, without exception handling.
+
+Parameter:
+
+1. `void *`: Destination array address
+2. `void *`: Source array address
+3. `unsigned int`: size of an object
+4. `unsigned int`: number of objects in the array
+5. `void (__thiscall *)(void *,void *)`: copy constructor of the class

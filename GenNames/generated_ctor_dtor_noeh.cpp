@@ -9,6 +9,8 @@
 // vector constructor iterator
 // vector destructor iterator
 // vector vbase constructor iterator
+// vector copy constructor iterator
+// vector vbase copy constructor iterator
 
 class vbase {
 public: int x;
@@ -19,7 +21,18 @@ public: int x;
 };
 
 class one : virtual public vbase {
+public:
+    one() = default;
+    ~one() = default;
+    one(const one&) {
+        std::cout << "one copy\n";
+    }
+};
 
+class wrap {
+public:
+    vbase v[7];
+    one o[11];
 };
 
 class two {
@@ -43,4 +56,7 @@ void generated_ctor_dtor() {
     delete[] ptwo;
     two tt;
     tt.~two();
+
+    wrap w;
+    wrap v = w;
 }
