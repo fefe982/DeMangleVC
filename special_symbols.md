@@ -310,6 +310,22 @@ Parameter:
 5. `void (__thiscall *)(void *,void *)`: copy constructor of the class
 6. `void (__thiscall *)(void *)`: destructor of the class
 
+## `dynamic initializer for`
+
+`??__E?d_c@D@@2VC@@A@@YAXXZ`
+
+``void __cdecl `dynamic initializer for 'public: static class C D::d_c''(void)``
+
+Generated dynamic initialization function for static variables.
+
+## `dynamic atexit destructor for`
+
+`??__F?d_c@D@@2VC@@A@@YAXXZ`
+
+``void __cdecl `dynamic atexit destructor for 'public: static class C D::d_c''(void)``
+
+Generated function to be register in `at_exit`, to destruct a static variable.
+
 ## `vector copy constructor iterator`
 
 `??__G@YGXPAX0IIP6EPAX00@Z@Z`
@@ -341,19 +357,3 @@ Parameter:
 3. `unsigned int`: size of an object
 4. `unsigned int`: number of objects in the array
 5. `void (__thiscall *)(void *,void *)`: copy constructor of the class
-
-## `dynamic initializer for`
-
-`??__E?d_c@D@@2VC@@A@@YAXXZ`
-
-``void __cdecl `dynamic initializer for 'public: static class C D::d_c''(void)``
-
-Generated dynamic initialization function for static variables.
-
-## `dynamic atexit destructor for`
-
-`??__F?d_c@D@@2VC@@A@@YAXXZ`
-
-``void __cdecl `dynamic atexit destructor for 'public: static class C D::d_c''(void)``
-
-Generated function to be register in `at_exit`, to destruct a static variable.
