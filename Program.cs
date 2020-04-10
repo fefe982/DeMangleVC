@@ -1156,7 +1156,7 @@ namespace DeMangleVC
             "`dynamic initializer for '.''",
             "`dynamic atexit destructor for '.''",
             "`vector copy constructor iterator'",
-            "__H",
+            "`vector vbase copy constructor iterator'",
             "__I",
             "__J",
             "__K",
