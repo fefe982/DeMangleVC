@@ -99,3 +99,19 @@ char(&&rrefarray____p_array___)[7] = std::move(array___);
 const char(&&rrefarray____p_array_c_)[7] = std::move(array_c_);
 volatile char(&&rrefarray____p_array__v)[7] = std::move(array__v);
 const volatile char(&&rrefarray____p_array_cv)[7] = std::move(array_cv);
+
+// class / struct / union / enum
+class A {} class_class;
+struct B {} class_struct;
+union C {} class_union;
+enum D {} class_enum;
+
+const A class_class_c;
+volatile A class_class_v;
+const volatile A class_class_cv;
+
+auto dummy_cls00 = &class_class_c;
+auto dummy_cls01 = &class_class_cv;
+
+enum class E {} class_enum_class;
+enum class F :char {} class_enum_class_char;

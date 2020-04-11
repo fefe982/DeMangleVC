@@ -127,10 +127,10 @@ CompoundType :=
     CompoundSpLt QualifiedName
 
 CompoundSpLt :=
-    T       // union
-    U       // struct
-    V       // class
-    W[0-7]  // enum
+    'T'       // union
+    'U'       // struct
+    'V'       // class
+    "W[0-7]"  // enum
 
 Func :=
     NonMemCVQFunc FuncP
