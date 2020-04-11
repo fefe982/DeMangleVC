@@ -50,8 +50,15 @@ int A::* const pmem_c_p = nullptr;
 int A::* volatile pmem_v_p = nullptr;
 int A::* const volatile pmem_cv_p = nullptr;
 
+void (A::* pfunc_p)() = nullptr;
+void (A::* const pfunc_c_p)() = nullptr;
+void (A::* volatile pfunc_v_p)() = nullptr;
+void (A::* const volatile pfunc_cv_p)() = nullptr;
+
 auto dummy01 = &pmem_c_p;
 auto dummy02 = &pmem_cv_p;
+auto dummy03 = &pfunc_c_p;
+auto dummy04 = &pfunc_cv_p;
 
 int A::data_pub;
 int A::data_protect;

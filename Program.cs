@@ -1975,7 +1975,7 @@ namespace DeMangleVC
                             {
                                 throw new Exception();
                             }
-                            sIdent = "[thunk]: __thiscall " + qID.getDemangledString() + "{" + val.ToString() + ",{flat}}' }'";
+                            sIdent = "[thunk]: __thiscall " + qID.getDemangledString() + "{" + val.ToString() + "}";
                             iProcessPos += 2;
                             break;
                         case 'C': // virtual desplacement map
