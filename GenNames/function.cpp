@@ -14,3 +14,10 @@ void func(const char*, ...) {}
 void func(unsigned int) noexcept {}
 void func(int) noexcept(false) {}
 void func(short) throw(int, short) {}
+
+// static function
+static void func(char) {}
+
+void dummy_func() {
+    func('c');
+}
