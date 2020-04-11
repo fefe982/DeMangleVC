@@ -27,3 +27,6 @@ void __fastcall func_fast() {}
 void __vectorcall func_vec() {}
 void __stdcall func_std() {}
 void __cdecl func_cdecl() {}
+
+// function pointer
+void (*pfunc)();

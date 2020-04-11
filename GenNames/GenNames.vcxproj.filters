@@ -42,5 +42,8 @@
     <ClCompile Include="function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="class_member.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

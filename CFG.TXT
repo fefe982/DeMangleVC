@@ -91,10 +91,21 @@ VarAccMode :=
     4   // function scope static variable
 
 CVQVar :=
+    SimpleCVQVar
+    'E' SimpleCVQVar    // __ptr64
+    MemberCVQVar NameQualifier '@' // used in pointer to member, NameQualier part specifies the "CLASS::" part
+
+SimpleCVQVar :=
     'A'     //
     'B'     // const
     'C'     // volatile
     'D'     // const volatile
+
+MemberCVQVar :=
+    'Q'     //
+    'R'     // const
+    'S'     // volatile
+    'T'     // const volatile
 
 Type :=
     BaseType        // int
@@ -162,6 +173,7 @@ CallConv :=
     'I'     // __fastcall
     'J'     // __fastcall
     'M'     // __clrcall
+    'Q'     // __vectorcall
 
 ThrowParamList: =
     ParamList
@@ -360,3 +372,4 @@ NonVoidType :=
     '_S' // char16_t
     '_U' // char32_t
     '_W' // wchar_t
+    '$$T' // nullptr_t

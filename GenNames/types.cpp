@@ -22,6 +22,8 @@ wchar_t type_wchar_v;
 char16_t type_char16_v;
 char32_t type_char32_v;
 
+nullptr_t null;
+
 //extended types
 __int8 exttype_int8_v; // same as char
 unsigned __int8 exttype_uint8_v; // same as unsigned char

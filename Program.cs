@@ -502,21 +502,26 @@ namespace DeMangleVC
                     break;
                 case '$':
                     iProcessPos++;
-                    if (src[iProcessPos] == '$' && src[iProcessPos + 1] == 'V')
-                    {   // "$$V" for empty template parameter list
-                        retType = new TypeNonType("");
-                        iProcessPos += 2;
-                    }
-                    else if (src[iProcessPos] == 'V')
-                    {
-                        retType = new TypeNonType("");
-                        iProcessPos++;
-                    }
-                    else
-                    {
-                        iProcessPos = pos;
-                        retType = new TypeReference().parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
-                    }
+                            if (src[iProcessPos] == '$' && src[iProcessPos + 1] == 'V')
+                            {   // "$$V" for empty template parameter list
+                                retType = new TypeNonType("");
+                                iProcessPos += 2;
+                            }
+                            else if (src[iProcessPos] == 'V')
+                            {
+                                retType = new TypeNonType("");
+                                iProcessPos++;
+                            }
+                            else if (src[iProcessPos] == 'T')
+                            {
+                                retType = new TypeSimple("std::nullptr_t");
+                                iProcessPos++;
+                            }
+                            else
+                            {
+                                iProcessPos = pos;
+                                retType = new TypeReference().parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
+                            }
                     break;
                 default:
                     throw new Exception();
@@ -574,6 +579,13 @@ namespace DeMangleVC
 
     class CVQ : StringComponent
     {
+        private static readonly String[] str_cv =
+        {
+            "",
+            "const",
+            "volatile",
+            "const volatile"
+        };
         private bool _bMemThis = false;
         private bool _bIgnoreNormalCV = false;
         public bool bMemThis
@@ -592,39 +604,39 @@ namespace DeMangleVC
             string suffix = "";
             switch (src[iProcessPos])
             {
-            case 'A':
-            case 'B':
-            case 'C':
-            case 'D':
-            case 'G':
-            case 'H':
-                if (src[iProcessPos] == 'G')
-                {
-                    suffix = "&";
-                    iProcessPos++;
-                }
-                else if (src[iProcessPos] == 'H')
-                {
-                    suffix = "&&";
-                    iProcessPos++;
-                }
-                switch (src[iProcessPos])
-                {
                 case 'A':
-                    _strRes = "";
-                    break;
                 case 'B':
-                    _strRes = "const";
-                    break;
                 case 'C':
-                    _strRes = "volatile";
-                    break;
                 case 'D':
-                    _strRes = "const volatile";
-                    break;
-                default:
-                    throw new Exception("Unrecognized CV-Qualifier after G-H " + src[iProcessPos]);
-                }
+                case 'E':
+                case 'G':
+                case 'H':
+                    if (src[iProcessPos] == 'E')
+                    {
+                        suffix = "__ptr64";
+                        iProcessPos++;
+                    }
+                    else if (src[iProcessPos] == 'G')
+                    {
+                        suffix = "&";
+                        iProcessPos++;
+                    }
+                    else if (src[iProcessPos] == 'H')
+                    {
+                        suffix = "&&";
+                        iProcessPos++;
+                    }
+                    switch (src[iProcessPos])
+                    {
+                        case 'A':
+                        case 'B':
+                        case 'C':
+                        case 'D':
+                            _strRes = str_cv[src[iProcessPos] - 'A'];
+                            break;
+                        default:
+                            throw new Exception("Unrecognized CV-Qualifier " + src[iProcessPos]);
+                    }
                     if (_bIgnoreNormalCV && suffix == "")
                     {
                         _strRes = "";
@@ -633,31 +645,31 @@ namespace DeMangleVC
                     {
                         _strRes += suffix;
                     }
-                break;
-            case 'E':
-                _strRes = "__ptr64";
-                iProcessPos++;
-                if (src[iProcessPos] != 'A')
-                {
-                    throw new Exception();
-                }
-                break;
-            case 'Q':
-                iProcessPos++;
-                _strRes = new NestNameSpecifier().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
-                iProcessPos--;
-                break;
-            case '6':
-                _strRes = "";
-                break;
-            case '8':
-                iProcessPos++;
-                _strRes = new NestNameSpecifier().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
-                _bMemThis = true;
-                iProcessPos--;
-                break;
-            default:
-                throw new Exception("Unrecognized CV-Qualifier " + src[iProcessPos]);
+                    break;
+                case 'Q':
+                case 'R':
+                case 'S':
+                case 'T':
+                    _strRes = str_cv[src[iProcessPos] - 'Q'];
+                    iProcessPos++;
+                    _strRes = StringHelper.glue(_strRes, new NestNameSpecifier().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString());
+                    iProcessPos--;
+                    if (_bIgnoreNormalCV)
+                    {
+                        _strRes = "";
+                    }
+                    break;
+                case '6':
+                    _strRes = "";
+                    break;
+                case '8':
+                    iProcessPos++;
+                    _strRes = new NestNameSpecifier().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+                    _bMemThis = true;
+                    iProcessPos--;
+                    break;
+                default:
+                    throw new Exception("Unrecognized CV-Qualifier " + src[iProcessPos]);
             }
             iProcessPos++;
             saveParseStatus(src, pos, iProcessPos);
@@ -950,6 +962,7 @@ namespace DeMangleVC
                 // Result for UnDecorateSymbolName is incorrect, in which the
                 // final CV is used but the cv stored in the reference kind is
                 // ignored.
+                // Also applies to the `C::` part in pointer to member `int C::* p`
                 CVQ cvq = new CVQ();
                 if (_baseType is TypeReference)
                 {

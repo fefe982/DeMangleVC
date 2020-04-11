@@ -89,6 +89,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="class_member.cpp">
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpplatest</LanguageStandard>
+    </ClCompile>
     <ClCompile Include="dynamic_init_dtor.cpp" />
     <ClCompile Include="function.cpp" />
     <ClCompile Include="generated_ctor_dtor.cpp" />
