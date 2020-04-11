@@ -987,7 +987,11 @@ namespace DeMangleVC
             "__fastcall",
             "",
             "",
-            "__clrcall"
+            "__clrcall",
+            "",
+            "",
+            "",
+            "__vectorcall"
         };
         private String _strCallConversion;
         private String _strParamList;
