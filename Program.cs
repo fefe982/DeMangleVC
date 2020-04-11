@@ -1202,11 +1202,11 @@ namespace DeMangleVC
             "`dynamic atexit destructor for '.''",
             "`vector copy constructor iterator'",
             "`vector vbase copy constructor iterator'",
-            "__I",
+            "`managed vector vbase copy constructor`",
             "__J",
             "__K",
-            "__L",
-            "__M",
+            "operator co_await",
+            "operator <=>",
             "__N",
             "__O",
             "__P",
@@ -1478,7 +1478,11 @@ namespace DeMangleVC
                 else if (src[iProcessPos] == '_')
                 {
                     iProcessPos++;
-                    if (src[iProcessPos] == 'E')
+                    if (src[iProcessPos] == 'L' || src[iProcessPos] == 'M')
+                    {
+                        strOperatorID = strOperatorC__[src[iProcessPos] - 'A'];
+                    }
+                    else if (src[iProcessPos] == 'E')
                     {
                         iProcessPos++;
                         String Decl = "";

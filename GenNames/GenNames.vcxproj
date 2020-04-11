@@ -99,6 +99,10 @@
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExceptionHandling>
     </ClCompile>
     <ClCompile Include="local_vftable.cpp" />
+    <ClCompile Include="operators.cpp">
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpplatest</LanguageStandard>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/await %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="placement_delete_closure.cpp" />
     <ClCompile Include="types.cpp" />
     <ClCompile Include="vftable_vbtable_RTTI.cpp" />

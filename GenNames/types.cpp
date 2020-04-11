@@ -117,3 +117,8 @@ auto dummy_cls01 = &class_class_cv;
 
 enum class E {} class_enum_class;
 enum class F :char {} class_enum_class_char;
+
+A (*class_array)[5] = nullptr;
+const A (*class_array_c)[5] = nullptr;
+volatile A (*class_array_v)[5] = nullptr;
+const volatile A (*class_array_cv)[5] = nullptr;

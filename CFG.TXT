@@ -111,7 +111,7 @@ Type :=
     BaseType        // int
     RefType         // pointer, ref
     ArrType         // Array
-    CompoundType    // class
+    CompoundType    // class; CompoundType is not used as top-level type, but it can be part of RefType or ArrType
     BackRefType
 
 ArrType :=
@@ -125,13 +125,14 @@ CVQType :=
     CVQVar Type
 
 RefSpLt :=
+    ?   // -- not a reference type. Used when a CompoundType is used alone.
     A   // &
     B   // & volatile
     P   // *
     Q   // * const
     R   // * volatile
     S   // * const volatile
-    $$C // -- This is not a reference type. It is used when a norma type need a CV, as only refType has a place for CV
+    $$C // -- This is not a reference type. It is used when a simple type need a CV, as only refType has a place for CV
     $$Q // &&
 
 CompoundType :=
@@ -310,9 +311,9 @@ OperatorName :=
     '?__G'              // `vector copy constructor iterator'
     '?__H'              // `vector vbase copy constructor iterator'
     '?__I'              // `managed vector vbase copy constructor'
-    '?__J'              // operator co_await
-    '?__M'              // operator <=>
     '?__K' StringName   // user define literal operators
+    '?__L'              // operator co_await
+    '?__M'              // operator <=>
 
 StringLiteral :=
     '??_C@' StringLiteralType '_' LiteralLength LiteralUID LiteralContent
