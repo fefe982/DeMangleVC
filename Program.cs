@@ -500,7 +500,7 @@ namespace DeMangleVC
                     retType = new TypeNonType(""); // Empty expansion list for integral types/size_t
                     iProcessPos++;
                     break;
-                case '$': // Simple ref, will use the letter C,
+                case '$':
                     iProcessPos++;
                     if (src[iProcessPos] == '$' && src[iProcessPos + 1] == 'V')
                     {   // "$$V" for empty template parameter list
@@ -751,7 +751,7 @@ namespace DeMangleVC
                 case 'B': // in parameter, array, no CV qualifier
                     noCV = true;
                     break;
-                case 'C': // in template paramter list
+                case 'C': // used when a simple type need a cvq, like array element, template parameter, etc. only complicate type has a place to encode a cvq.
                     break;
                 case 'Q':
                     _strReferenceType = "&&";

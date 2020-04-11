@@ -96,6 +96,7 @@
     </ClCompile>
     <ClCompile Include="local_vftable.cpp" />
     <ClCompile Include="placement_delete_closure.cpp" />
+    <ClCompile Include="types.cpp" />
     <ClCompile Include="vftable_vbtable_RTTI.cpp" />
     <ClCompile Include="virtual_displacement_map.cpp" />
   </ItemGroup>

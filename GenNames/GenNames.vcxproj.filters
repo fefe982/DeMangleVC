@@ -36,5 +36,8 @@
     <ClCompile Include="dynamic_init_dtor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
