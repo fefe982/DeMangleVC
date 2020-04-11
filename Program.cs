@@ -575,9 +575,15 @@ namespace DeMangleVC
     class CVQ : StringComponent
     {
         private bool _bMemThis = false;
+        private bool _bIgnoreNormalCV = false;
         public bool bMemThis
         {
             get { return _bMemThis; }
+        }
+        public CVQ IgnoreNormalCV(bool ignore)
+        {
+            _bIgnoreNormalCV = ignore;
+            return this;
         }
         public override ParseBase parse(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
         {
@@ -619,7 +625,14 @@ namespace DeMangleVC
                 default:
                     throw new Exception("Unrecognized CV-Qualifier after G-H " + src[iProcessPos]);
                 }
-                _strRes = _strRes + suffix;
+                    if (_bIgnoreNormalCV && suffix == "")
+                    {
+                        _strRes = "";
+                    }
+                    else
+                    {
+                        _strRes += suffix;
+                    }
                 break;
             case 'E':
                 _strRes = "__ptr64";
@@ -931,7 +944,21 @@ namespace DeMangleVC
 
             if (iSpecialVariable != 9 && iSpecialVariable != 8 && iSpecialVariable != 5)
             {
+#if REFINE__
+                // Top level CV for reference is stored with kind of reference
+                // Final cv should be ignored.
+                // Result for UnDecorateSymbolName is incorrect, in which the
+                // final CV is used but the cv stored in the reference kind is
+                // ignored.
+                CVQ cvq = new CVQ();
+                if (_baseType is TypeReference)
+                {
+                    cvq.IgnoreNormalCV(true);
+                }
+                _strCVQualifier = cvq.parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+#else
                 _strCVQualifier = (new CVQ()).parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+#endif
             }
 
             if (iSpecialVariable == 5)
@@ -1811,7 +1838,7 @@ namespace DeMangleVC
             }
             iProcessPos++;
             pos = iProcessPos;
-#if REFINE__ 
+#if REFINE__
 #else // UnDecorateSymbolName will not output the lenth and content part of string literal
             _strRes = "";
 #endif
