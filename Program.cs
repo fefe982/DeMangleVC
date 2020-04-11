@@ -963,6 +963,7 @@ namespace DeMangleVC
                 // final CV is used but the cv stored in the reference kind is
                 // ignored.
                 // Also applies to the `C::` part in pointer to member `int C::* p`
+                // The result without REFINE__ is not the same as UnDecorateSymbolName
                 CVQ cvq = new CVQ();
                 if (_baseType is TypeReference)
                 {

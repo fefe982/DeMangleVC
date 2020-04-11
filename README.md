@@ -7,15 +7,20 @@ It main purpose is to get the undecorated names from the mangled symbol names ge
 
 I started the project before I even know about `UndecorateSymbolName` in `dbghelp.dll`.
 But after I know it, I believes this project can do better than `UndecoratedSymbolName`.
-You can refer to the `REFINE__` macro in the code.
+
+~~You can refer to the `REFINE__` macro in the code.
 Without it, the project tries to generate exact the same output as `UndecorateSymbolName`;
-with `REFINE__`, the project will do some of its own refinement.
+with `REFINE__`, the project will do some of its own refinement.~~
 
 One example would be, in `UndecorateSymbolName`, there is no blank between `operater??` and
 the following template parameter list. So you can see things like `operator<<int>(...)` in the output.
 The project with refine will insert a blank: `operator< <int>(...)`.
 
 Also, there are a lot of symbols that `UndecorateSymbolName` cannot handle.
+
+I noticed sometimes `UndecoratedSymbolName` can generator **wrong** result. For example with type `?pointer__v_p_c__c@@3RBDB`(`char const * volatile pointer__v_p_c__c`), it outputs `char const * const pointer__v_p_c__c`. Another example is the compiler generated symbol `?$S1@?1??dynamic_init_dtor@@YAXXZ@4IA`, which should be ``unsigned int `void __cdecl dynamic_init_dtor(void)'::`2'::$S1``, but it generates ``S1<`template-parameter-2',ynamic_init_dtor,unsigned int, ?? &>``. Currently the code without `REFINE__` is not mantained. These code may be removed in the future. (Maybe I need to get a higher version of `dbghelp.dll`.)
+
+The results from `UndecoratedSymbolName` is still used as reference, and the project use it to demangle the names is still included in this project.
 
 The project now works with VS2019. You can get a community version for free.
 
