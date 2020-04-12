@@ -51,11 +51,11 @@ TplParaList :=
 TplPara :=
     '$$$V'  // empty parameter expansion (type)
     '$$V'   // empty parameter expansion (type)
+    '$$Z'   // separater for two consecutive expanstion packs
     '$S'    // empty parameter expansion (size_t)
     Type    // template template parameter is not distingushable with type template parameter
-    IntTplPara
-    RefTplPara
-    PointerTplPara
+    IntTplPara      // Non-type template argument of types: Integral / pointer to data member / nullptr_t
+    PointerTplPara  // Non-type template argument of types: pointer / l-value reference to object / function; pointer to member function
 
 IntTplPara :=
     '$0' IntConst
@@ -66,11 +66,8 @@ IntConst :=
     '?' "[0-9]"          // -1 ~ -10
     '?' "[A-P][A-P]+" '@'   // other negtive
 
-RefTplPara :=
-    '$?' QualifiedName VariableType
-
 PointerTplPara :=
-    '?1' QualifiedName VariableType
+    '?1' Ident
 
 VariableType :=
     VarAccMode Type CVQVar
@@ -120,18 +117,20 @@ ArrType :=
 RefType :=
     RefSpLt CVQType
     RefSpLt Func
+    '$$B' ArrType // Array use alone, not part of other RefType. Has no CVQ part.
 
 CVQType :=
     CVQVar Type
 
 RefSpLt :=
-    ?   // -- not a reference type. Used when a CompoundType is used alone.
+    ?   // -- not a reference type. Used when a (possibly cv-qualified) CompoundType is used alone.
     A   // &
     B   // & volatile
     P   // *
     Q   // * const
     R   // * volatile
     S   // * const volatile
+    $$A // -- not a reference. Used for function. (Not a function pointer nor a function reference, but a function. May appear in template argument)
     $$C // -- This is not a reference type. It is used when a simple type need a CV, as only refType has a place for CV
     $$Q // &&
 
@@ -146,7 +145,7 @@ CompoundSpLt :=
 
 Func :=
     NonMemCVQFunc FuncP
-    MemCVQFunc ClassNamespaceList CVQThis FuncP
+    MemCVQFunc ClassNamespaceList CVQThis FuncP  // used for pionter to member function
 
 CVQThis :=
     CVQVar

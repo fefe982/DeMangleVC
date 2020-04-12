@@ -191,37 +191,37 @@ namespace DeMangleVC
             }
             switch (src[iProcessPos])
             {
-            case 'A':
-            case 'I':
-            case 'Q':
-                break;
-            case 'C':
-            case 'S':
-            case 'K':
-                _bHasThis = false;
-                sModifier = strModifier[(int)enumModifier.enmMstatic];
-                break;
-            case 'E':
-            case 'M':
-            case 'U':
-                sModifier = strModifier[(int)enumModifier.enmMvirtual];
-                break;
-            case 'G':
-            case 'O':
-            case 'W':
-                iProcessPos++;
-                long lAdjustor = StringComponent.getInteger(src, ref iProcessPos);
-                sThunkPrefix = "[thunk]:";
-                _sThunkAdjustor = "`adjustor{" + lAdjustor.ToString() + "}\' ";
-                sModifier = strModifier[(int)enumModifier.enmMvirtual];
-                iProcessPos--;
-                break;
-            case 'Y':
-                _bHasThis = false;
-                sModifier = "";
-                break;
-            default:
-                throw new Exception();
+                case 'A':
+                case 'I':
+                case 'Q':
+                    break;
+                case 'C':
+                case 'S':
+                case 'K':
+                    _bHasThis = false;
+                    sModifier = strModifier[(int)enumModifier.enmMstatic];
+                    break;
+                case 'E':
+                case 'M':
+                case 'U':
+                    sModifier = strModifier[(int)enumModifier.enmMvirtual];
+                    break;
+                case 'G':
+                case 'O':
+                case 'W':
+                    iProcessPos++;
+                    long lAdjustor = StringComponent.getInteger(src, ref iProcessPos);
+                    sThunkPrefix = "[thunk]:";
+                    _sThunkAdjustor = "`adjustor{" + lAdjustor.ToString() + "}\' ";
+                    sModifier = strModifier[(int)enumModifier.enmMvirtual];
+                    iProcessPos--;
+                    break;
+                case 'Y':
+                    _bHasThis = false;
+                    sModifier = "";
+                    break;
+                default:
+                    throw new Exception();
             }
             iProcessPos++;
             if (tAccess != "" && sModifier != "")
@@ -395,64 +395,7 @@ namespace DeMangleVC
             int iProcessPos = pos;
             switch (src[iProcessPos])
             {
-            case 'C':
-            case 'D':
-            case 'E':
-            case 'F':
-            case 'G':
-            case 'H':
-            case 'I':
-            case 'J':
-            case 'K':
-            case 'M':
-            case 'N':
-            case 'O':
-            case 'X':
-                retType = new TypeSimple(strType[src[iProcessPos] - 'A']);
-                iProcessPos++;
-                break;
-            case '?':
-            case 'A':
-            case 'B':
-            case 'P':
-            case 'Q':
-            case 'R':
-            case 'S':
-                retType = new TypeReference().parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
-                break;
-            case 'T':
-            case 'U':
-            case 'V':
-            case 'W':
-                retType = new TypeClass().parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
-                break;
-            case 'Y':
-                retType = new TypeArray().parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
-                break;
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                retType = vType[src[iProcessPos] - '0'];
-#if TRACE
-                Console.Error.WriteLine("dump vType");
-                for (int i = 0; i < vType.Count; i++)
-                {
-                    Console.Error.WriteLine("{0} , {1}", i, vType[i].getDemangledString());
-                }
-#endif
-                iProcessPos++;
-                break;
-            case '_':
-                iProcessPos++;
-                switch (src[iProcessPos])
-                {
+                case 'C':
                 case 'D':
                 case 'E':
                 case 'F':
@@ -461,54 +404,105 @@ namespace DeMangleVC
                 case 'I':
                 case 'J':
                 case 'K':
-                case 'L':
                 case 'M':
                 case 'N':
+                case 'O':
+                case 'X':
+                    retType = new TypeSimple(strType[src[iProcessPos] - 'A']);
+                    iProcessPos++;
+                    break;
+                case '?':
+                case 'A':
+                case 'B':
+                case 'P':
+                case 'Q':
+                case 'R':
                 case 'S':
+                    retType = new TypeReference().parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
+                    break;
+                case 'T':
                 case 'U':
+                case 'V':
                 case 'W':
-                    retType = new TypeSimple(strType_[src[iProcessPos] - 'A']);
-                    iProcessPos++;
+                    retType = new TypeClass().parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
                     break;
-                default:
-                    throw new Exception("Type specific letter _" + new String(src[iProcessPos], 1) + " not found");
-                }
-                break;
-            case '$': // special type or type like identifier
-                iProcessPos++;
-
-                switch (src[iProcessPos])
+                case 'Y':
+                    retType = new TypeArray().parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
+                    break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    retType = vType[src[iProcessPos] - '0'];
+#if TRACE
+                Console.Error.WriteLine("dump vType");
+                for (int i = 0; i < vType.Count; i++)
                 {
-                case '0': // integer
+                    Console.Error.WriteLine("{0} , {1}", i, vType[i].getDemangledString());
+                }
+#endif
                     iProcessPos++;
-                    retType = new TypeNonType(StringComponent.getInteger(src, ref iProcessPos).ToString());
                     break;
-                case '1': // pointer
-                    QualifiedID qID = new QualifiedID();
-                    TypeVarType vTypeID = new TypeVarType();
+                case '_':
                     iProcessPos++;
-                    if (src[iProcessPos] != '?')
+                    switch (src[iProcessPos])
                     {
-                        throw (new Exception("\'?\' expected in reference parameter"));
+                        case 'D':
+                        case 'E':
+                        case 'F':
+                        case 'G':
+                        case 'H':
+                        case 'I':
+                        case 'J':
+                        case 'K':
+                        case 'L':
+                        case 'M':
+                        case 'N':
+                        case 'S':
+                        case 'U':
+                        case 'W':
+                            retType = new TypeSimple(strType_[src[iProcessPos] - 'A']);
+                            iProcessPos++;
+                            break;
+                        default:
+                            throw new Exception("Type specific letter _" + new String(src[iProcessPos], 1) + " not found");
                     }
-                    iProcessPos++;
-                    qID.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                    vTypeID.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                    retType = new TypeNonType("&" + vTypeID.getDeclaration(qID.getDemangledString()));
                     break;
-                case 'S':
-                    retType = new TypeNonType(""); // Empty expansion list for integral types/size_t
+                case '$': // special type or type like identifier
                     iProcessPos++;
-                    break;
-                case '$':
-                    iProcessPos++;
+
+                    switch (src[iProcessPos])
+                    {
+                        case '0': // integer
+                            iProcessPos++;
+                            retType = new TypeNonType(StringComponent.getInteger(src, ref iProcessPos).ToString());
+                            break;
+                        case '1': // pointer or l-value reference non-type template argument
+                            // a full Declaration follows;
+                            iProcessPos++;
+                            Declaration Decl = new Declaration();
+                            Decl.parse(src, ref iProcessPos, ref vType, ref vUiD);
+                            retType = new TypeNonType("&" + Decl.QualifiedID.getDemangledString() + " /* " + Decl.getDemangledString() + " */");
+                            break;
+                        case 'S':
+                            retType = new TypeNonType(""); // Empty expansion list for integral types/size_t
+                            iProcessPos++;
+                            break;
+                        case '$':
+                            iProcessPos++;
                             if (src[iProcessPos] == '$' && src[iProcessPos + 1] == 'V')
                             {   // "$$V" for empty template parameter list
                                 retType = new TypeNonType("");
                                 iProcessPos += 2;
                             }
                             else if (src[iProcessPos] == 'V')
-                            {
+                            { // empty template parameter expanstion pack
                                 retType = new TypeNonType("");
                                 iProcessPos++;
                             }
@@ -517,21 +511,26 @@ namespace DeMangleVC
                                 retType = new TypeSimple("std::nullptr_t");
                                 iProcessPos++;
                             }
+                            else if (src[iProcessPos] == 'Z')
+                            { // separator between two empty template parameter expanstion packs
+                                retType = new TypeNonType("");
+                                iProcessPos++;
+                            }
                             else
                             {
                                 iProcessPos = pos;
                                 retType = new TypeReference().parse(src, ref iProcessPos, ref vType, ref vUiD).toType();
                             }
+                            break;
+                        default:
+                            throw new Exception();
+                    }
+                    break;
+                case '@':
+                    retType = new TypeNonType("");
                     break;
                 default:
-                    throw new Exception();
-                }
-                break;
-            case '@':
-                retType = new TypeNonType("");
-                break;
-            default:
-                throw new Exception("Type specific letter " + new String(src[iProcessPos], 1) + " not found");
+                    throw new Exception("Type specific letter " + new String(src[iProcessPos], 1) + " not found");
             }
             if (topLevelType && iProcessPos > pos + 1 && !(retType is TypeNonType))
             {
@@ -731,49 +730,50 @@ namespace DeMangleVC
             bool noCV = false;
             switch (src[iProcessPos])
             {
-            case 'A':
-            case 'B':
-            case 'P':
-            case 'Q':
-            case 'R':
-            case 'S':
-                if (src[iProcessPos + 1] == 'E')
-                {
-                    _strReferenceType = strTypeE[src[iProcessPos] - 'A'];
-                    iProcessPos++;
-                }
-                else
-                {
-                    _strReferenceType = strType[src[iProcessPos] - 'A'];
-                }
-                break;
-            case '?': // type transfered by value
-                break;
-            case '$':
-                iProcessPos++;
-                if (src[iProcessPos] != '$')
-                {
-                    throw new Exception("Illegal special type identifier");
-                }
-                iProcessPos++;
-                switch (src[iProcessPos])
-                {
-                case 'A': // function pointers
-                    break;
-                case 'B': // in parameter, array, no CV qualifier
-                    noCV = true;
-                    break;
-                case 'C': // used when a simple type need a cvq, like array element, template parameter, etc. only complicate type has a place to encode a cvq.
-                    break;
+                case 'A':
+                case 'B':
+                case 'P':
                 case 'Q':
-                    _strReferenceType = "&&";
+                case 'R':
+                case 'S':
+                    if (src[iProcessPos + 1] == 'E')
+                    {
+                        _strReferenceType = strTypeE[src[iProcessPos] - 'A'];
+                        iProcessPos++;
+                    }
+                    else
+                    {
+                        _strReferenceType = strType[src[iProcessPos] - 'A'];
+                    }
+                    break;
+                case '?': // type transfered by value
+                    break;
+                case '$':
+                    iProcessPos++;
+                    if (src[iProcessPos] != '$')
+                    {
+                        throw new Exception("Illegal special type identifier");
+                    }
+                    iProcessPos++;
+                    switch (src[iProcessPos])
+                    {
+                        case 'A': // function. (not pointer or reference to function, but a function)
+                                  // can appear in template argument
+                            break;
+                        case 'B': // array, no CV qualifier (can appear in template argument)
+                            noCV = true;
+                            break;
+                        case 'C': // used when a simple type need a cvq, like array element, template parameter, etc. only complicate type has a place to encode a cvq.
+                            break;
+                        case 'Q':
+                            _strReferenceType = "&&";
+                            break;
+                        default:
+                            throw new Exception("illegal Special Ref : " + src[iProcessPos]);
+                    }
                     break;
                 default:
-                    throw new Exception("illegal Special Ref : " + src[iProcessPos]);
-                }
-                break;
-            default:
-                throw new Exception("Illegal leading char in Ref and Pointer Type : " + src[iProcessPos]);
+                    throw new Exception("Illegal leading char in Ref and Pointer Type : " + src[iProcessPos]);
             }
             iProcessPos++;
             CVQ cvq = new CVQ();
@@ -828,16 +828,16 @@ namespace DeMangleVC
             }
             switch (cType)
             {
-            case 'T':
-            case 'U':
-            case 'V':
-            case 'W':
-                iProcessPos++;
-                _classKey = StringHelper.glue(strType[cType - 'A'], infixEnum);
-                _strClassQualifiedName = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
-                break;
-            default:
-                throw new Exception("illegal compound : " + cType);
+                case 'T':
+                case 'U':
+                case 'V':
+                case 'W':
+                    iProcessPos++;
+                    _classKey = StringHelper.glue(strType[cType - 'A'], infixEnum);
+                    _strClassQualifiedName = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+                    break;
+                default:
+                    throw new Exception("illegal compound : " + cType);
             }
             saveParseStatus(src, pos, iProcessPos);
             pos = iProcessPos;
@@ -880,7 +880,15 @@ namespace DeMangleVC
             long Dimension = StringComponent.getInteger(src, ref iProcessPos);
             for (long i = 0; i < Dimension; i++)
             {
-                _strSubcript = _strSubcript + "[" + StringComponent.getInteger(src, ref iProcessPos) + "]";
+                // a dimension of 0 is used of array of unknown bound
+                // may appear in template argument
+                long dim = StringComponent.getInteger(src, ref iProcessPos);
+                string s_dim = "";
+                if (dim > 0)
+                {
+                    s_dim = dim.ToString();
+                }
+                _strSubcript = _strSubcript + "[" + s_dim + "]";
             }
             _baseType = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD);
             saveParseStatus(src, pos, iProcessPos);
@@ -908,44 +916,44 @@ namespace DeMangleVC
             int iSpecialVariable = 0;
             switch (src[iProcessPos])
             {
-            case '0':
-                _strAccess = "private: static ";
-                break;
-            case '1':
-                _strAccess = "protected: static ";
-                break;
-            case '2':
-                _strAccess = "public: static ";
-                break;
-            case '3':
-                _strAccess = "";
-                break;
-            case '4': // function scope static variable
-                _strAccess = "";
-                break;
-            case '5':
-                _strAccess = "";
-                iSpecialVariable = 5;
-                break;
-            case '6': // `vftable'
-                _strAccess = "";
-                iSpecialVariable = 6;
-                break;
-            case '7': // `vbtable'
-                _strAccess = "";
-                iSpecialVariable = 7;
-                break;
-            case '8':
-                _strAccess = "";
-                iSpecialVariable = 8;
-                break;
-            case '9':
-                _strAccess = "";
-                iSpecialVariable = 9;
-                break;
-            default:
-                throw new Exception("Illegal Variable Acess modifier: " + src[iProcessPos]);
-            //break;
+                case '0':
+                    _strAccess = "private: static ";
+                    break;
+                case '1':
+                    _strAccess = "protected: static ";
+                    break;
+                case '2':
+                    _strAccess = "public: static ";
+                    break;
+                case '3':
+                    _strAccess = "";
+                    break;
+                case '4': // function scope static variable
+                    _strAccess = "";
+                    break;
+                case '5':
+                    _strAccess = "";
+                    iSpecialVariable = 5;
+                    break;
+                case '6': // `vftable'
+                    _strAccess = "";
+                    iSpecialVariable = 6;
+                    break;
+                case '7': // `vbtable'
+                    _strAccess = "";
+                    iSpecialVariable = 7;
+                    break;
+                case '8':
+                    _strAccess = "";
+                    iSpecialVariable = 8;
+                    break;
+                case '9':
+                    _strAccess = "";
+                    iSpecialVariable = 9;
+                    break;
+                default:
+                    throw new Exception("Illegal Variable Acess modifier: " + src[iProcessPos]);
+                    //break;
             }
             iProcessPos++;
 
@@ -1279,15 +1287,15 @@ namespace DeMangleVC
             idt._strRes = idt._strRes.Insert(insertionPoint, TplParaList);
             switch (idt._eUnqualifiedIdType)
             {
-            case enumUnqualifiedID.enmIdentifier:
-                idt._eUnqualifiedIdType = enumUnqualifiedID.enmTemplateID;
-                break;
-            case enumUnqualifiedID.enmOperatorFunctionID:
-            case enumUnqualifiedID.enmCtorDtor:
-            case enumUnqualifiedID.enmConversionFuctionID:
-                break;
-            default:
-                throw new Exception("illegal template");
+                case enumUnqualifiedID.enmIdentifier:
+                    idt._eUnqualifiedIdType = enumUnqualifiedID.enmTemplateID;
+                    break;
+                case enumUnqualifiedID.enmOperatorFunctionID:
+                case enumUnqualifiedID.enmCtorDtor:
+                case enumUnqualifiedID.enmConversionFuctionID:
+                    break;
+                default:
+                    throw new Exception("illegal template");
             }
             return idt;
         }
@@ -1427,36 +1435,36 @@ namespace DeMangleVC
                     iProcessPos++;
                     switch (src[iProcessPos])
                     {
-                    case '0':
-                        iProcessPos++;
-                        Type strClassType;
-                        strClassType = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD);
-                        strOperatorID = strClassType.getDeclaration("") + " `RTTI Type Descriptor'";
-                        break;
-                    case '1':
-                        int[] iNum = new int[4];
-                        iProcessPos++;
-                        for (int i = 0; i < 4; i++)
-                        {
-                            long num = StringComponent.getInteger(src, ref iProcessPos);
-                            iNum[i] = (int)num;
-                        }
-                        strOperatorID = "`RTTI Base Class Descriptor at (" + iNum[0] + "," + iNum[1] + "," + iNum[2] + "," + iNum[3] + ")'";
-                        break;
-                    case '2':
-                        iProcessPos++;
-                        strOperatorID = "`RTTI Base Class Array'";
-                        break;
-                    case '3':
-                        iProcessPos++;
-                        strOperatorID = "`RTTI Class Hierarchy Descriptor'";
-                        break;
-                    case '4':
-                        iProcessPos++;
-                        strOperatorID = "`RTTI Complete Object Locator'";
-                        break;
-                    default:
-                        throw new Exception("Invalid RTTI descriptor");
+                        case '0':
+                            iProcessPos++;
+                            Type strClassType;
+                            strClassType = Type.GetTypeLikeID(src, ref iProcessPos, ref vType, ref vUiD);
+                            strOperatorID = strClassType.getDeclaration("") + " `RTTI Type Descriptor'";
+                            break;
+                        case '1':
+                            int[] iNum = new int[4];
+                            iProcessPos++;
+                            for (int i = 0; i < 4; i++)
+                            {
+                                long num = StringComponent.getInteger(src, ref iProcessPos);
+                                iNum[i] = (int)num;
+                            }
+                            strOperatorID = "`RTTI Base Class Descriptor at (" + iNum[0] + "," + iNum[1] + "," + iNum[2] + "," + iNum[3] + ")'";
+                            break;
+                        case '2':
+                            iProcessPos++;
+                            strOperatorID = "`RTTI Base Class Array'";
+                            break;
+                        case '3':
+                            iProcessPos++;
+                            strOperatorID = "`RTTI Class Hierarchy Descriptor'";
+                            break;
+                        case '4':
+                            iProcessPos++;
+                            strOperatorID = "`RTTI Complete Object Locator'";
+                            break;
+                        default:
+                            throw new Exception("Invalid RTTI descriptor");
                     }
                     iProcessPos--;
                     _strRes = strOperatorID;
@@ -1503,7 +1511,7 @@ namespace DeMangleVC
                         String Decl = "";
                         if (src[iProcessPos] == '?')
                         {
-                            Decl = Decl = new Declaration().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+                            Decl = new Declaration().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
                         }
                         else
                         {
@@ -1554,61 +1562,61 @@ namespace DeMangleVC
             int iProcessPos = pos;
             switch (src[iProcessPos])
             {
-            case '?':
-                iProcessPos++;
-                switch (src[iProcessPos])
-                {
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                case 'B':
-                case 'C':
-                case 'D':
-                case 'E':
-                case 'F':
-                case 'G':
-                case 'H':
-                case 'I':
-                case 'J':
-                case 'K':
-                case 'L':
-                case 'M':
-                case 'N':
-                case 'O':
-                case 'P':
-                    long val = StringComponent.getInteger(src, ref iProcessPos);
-                    _strRes = "`" + val.ToString() + "\'";
-                    _eUnqualifiedIdType = UnqualifiedID.enumUnqualifiedID.enmIdentifier;
-                    break;
-                case 'A':
-                    parseAnonymousNameSpace(src, ref iProcessPos);
-                    vUiD.Add(this);
-                    break;
-                case '$':
-                    iProcessPos++;
-                    parseTemplateID(src, ref iProcessPos, ref vType, ref vUiD);
-                    vUiD.Add(this);
-                    break;
                 case '?':
-                    _strRes = "`" + (new Declaration()).parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString() + "'";
-                    _eUnqualifiedIdType = UnqualifiedID.enumUnqualifiedID.enmIdentifier;
+                    iProcessPos++;
+                    switch (src[iProcessPos])
+                    {
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '9':
+                        case 'B':
+                        case 'C':
+                        case 'D':
+                        case 'E':
+                        case 'F':
+                        case 'G':
+                        case 'H':
+                        case 'I':
+                        case 'J':
+                        case 'K':
+                        case 'L':
+                        case 'M':
+                        case 'N':
+                        case 'O':
+                        case 'P':
+                            long val = StringComponent.getInteger(src, ref iProcessPos);
+                            _strRes = "`" + val.ToString() + "\'";
+                            _eUnqualifiedIdType = UnqualifiedID.enumUnqualifiedID.enmIdentifier;
+                            break;
+                        case 'A':
+                            parseAnonymousNameSpace(src, ref iProcessPos);
+                            vUiD.Add(this);
+                            break;
+                        case '$':
+                            iProcessPos++;
+                            parseTemplateID(src, ref iProcessPos, ref vType, ref vUiD);
+                            vUiD.Add(this);
+                            break;
+                        case '?':
+                            _strRes = "`" + (new Declaration()).parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString() + "'";
+                            _eUnqualifiedIdType = UnqualifiedID.enumUnqualifiedID.enmIdentifier;
+                            break;
+                        default:
+                            throw new Exception("unknow character after \'?\' : " + src[iProcessPos]);
+                    }
                     break;
                 default:
-                    throw new Exception("unknow character after \'?\' : " + src[iProcessPos]);
-                }
-                break;
-            default:
-                _strRes = StringComponent.getString(src, ref iProcessPos);
-                vUiD.Add(this);
-                _eUnqualifiedIdType = enumUnqualifiedID.enmIdentifier;
-                break;
+                    _strRes = StringComponent.getString(src, ref iProcessPos);
+                    vUiD.Add(this);
+                    _eUnqualifiedIdType = enumUnqualifiedID.enmIdentifier;
+                    break;
             }
             pos = iProcessPos;
         }
@@ -1787,7 +1795,7 @@ namespace DeMangleVC
 
     class StringLiteral : StringComponent
     {
-        private static String[] shortString = { ",", "/", "\\\\", ":", ".", " ", "\\n", "\\t", "'", "-"};
+        private static String[] shortString = { ",", "/", "\\\\", ":", ".", " ", "\\n", "\\t", "'", "-" };
         public override ParseBase parse(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
         {
             int iProcessPos = pos;
@@ -1870,6 +1878,11 @@ namespace DeMangleVC
 
     class Declaration : StringComponent
     {
+        private QualifiedID qID;
+        public QualifiedID QualifiedID
+        {
+            get { return qID; }
+        }
         public override ParseBase parse(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD)
         {
             int iProcessPos = pos;
@@ -1878,7 +1891,7 @@ namespace DeMangleVC
                 throw new Exception("Declaration should begin with '?'");
             }
             iProcessPos++;
-            QualifiedID qID = new QualifiedID(true);
+            qID = new QualifiedID(true);
             qID.parse(src, ref iProcessPos, ref vType, ref vUiD);
             String sIdent = "";
             if (qID.getDemangledString() == "$_C#")
@@ -1895,24 +1908,24 @@ namespace DeMangleVC
                 {
                     switch (src[iProcessPos])
                     {
-                    default:
-                        if (qID.getDemangledString().EndsWith("::`vftable'") || qID.getDemangledString().EndsWith("::`vbtable'") || qID.getDemangledString().EndsWith("::`RTTI Complete Object Locator'") || qID.getDemangledString().EndsWith("::`local vftable'"))
-                        {
-                            if (src[iProcessPos] != '@')
+                        default:
+                            if (qID.getDemangledString().EndsWith("::`vftable'") || qID.getDemangledString().EndsWith("::`vbtable'") || qID.getDemangledString().EndsWith("::`RTTI Complete Object Locator'") || qID.getDemangledString().EndsWith("::`local vftable'"))
                             {
-                                forDst = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+                                if (src[iProcessPos] != '@')
+                                {
+                                    forDst = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+                                }
+                                iProcessPos++;
                             }
-                            iProcessPos++;
-                        }
-                        else if (qID.getDemangledString().EndsWith("::__LINE__Var"))
-                        {   // generated cont var for __LINE__ , may contain arbitrary hash to avoid confiliction
-                            if (src[iProcessPos] != '@' || iProcessPos < src.Length - 9)
-                            {
-                                throw new Exception();
+                            else if (qID.getDemangledString().EndsWith("::__LINE__Var"))
+                            {   // generated cont var for __LINE__ , may contain arbitrary hash to avoid confiliction
+                                if (src[iProcessPos] != '@' || iProcessPos < src.Length - 9)
+                                {
+                                    throw new Exception();
+                                }
+                                iProcessPos += 9;
                             }
-                            iProcessPos += 9;
-                        }
-                        break;
+                            break;
                     }
                 }
                 sIdent = sType.getDeclaration(qID.getDemangledString());

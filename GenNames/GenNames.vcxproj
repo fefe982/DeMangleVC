@@ -104,6 +104,9 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/await %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ClCompile Include="placement_delete_closure.cpp" />
+    <ClCompile Include="template.cpp">
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpplatest</LanguageStandard>
+    </ClCompile>
     <ClCompile Include="types.cpp" />
     <ClCompile Include="vftable_vbtable_RTTI.cpp" />
     <ClCompile Include="virtual_displacement_map.cpp" />
