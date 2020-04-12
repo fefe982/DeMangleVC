@@ -2,7 +2,14 @@
 class A {
 public:
     int a;
-    void b() {}
+    int b;
+    int c;
+    int d;
+    int e;
+    void func_a() {}
+    void func_b() {}
+    void func_c() {}
+    void func_d() {}
 };
 template<typename> class temp_t {};
 temp_t<int> temp_t_int;
@@ -70,7 +77,7 @@ temp_t_v<void(&)(), func> temp_t_v_ref_func;
 temp_t_v<int A::*, &A::a> temp_t_v_pmember;
 temp_t_v<int A::* const, &A::a> temp_t_v_cpmember;
 
-temp_t_v<void (A::*)(), &A::b> temp_t_v_pmemfun;
+temp_t_v<void (A::*)(), &A::func_b> temp_t_v_pmemfun;
 
 temp_t_v<nullptr_t, nullptr> temp_t_v_nullptr;
 
@@ -83,6 +90,46 @@ temp_t_pack<int, char> temp_t_pack_int_char;
 template<typename...T, typename ...U> void func_packpack(std::tuple<T...>, std::tuple<U...>) {};
 
 template<typename...T, typename K, typename ...U> void func_packtpack(std::tuple<T...>, K, std::tuple<U...>) {};
+
+template<int...i> class tuple_i {};
+
+template<int...T, int ...U> void func_i_packpack(tuple_i<T...>, tuple_i<U...>) {};
+
+template<int...T, int K, int ...U> void func_i_packipack(tuple_i<T...>, int(&arr)[K], tuple_i<U...>) {};
+
+#define PACKTEST_DECL(type, suf) \
+template<type...i> class tuple_##suf {};\
+template<type...T, type ...U> void func_##suf##_packpack(tuple_##suf<T...>, tuple_##suf<U...>) {}; \
+template<type...T, type K, type ...U> void func_##suf##_packipack(tuple_##suf<T...>, tuple_##suf<K>, tuple_##suf<U...>) {};
+
+#define PACKTEST_CALL(type, suf, i1, i2, i3, i4) \
+    func_##suf##_packpack(tuple_##suf<>(), tuple_##suf<>()); \
+    func_##suf##_packpack(tuple_##suf<i1>(), tuple_##suf<>()); \
+    func_##suf##_packpack(tuple_##suf<>(), tuple_##suf<i1>()); \
+    func_##suf##_packpack(tuple_##suf<i1, i2>(), tuple_##suf<i3>()); \
+    func_##suf##_packpack(tuple_##suf<i1>(), tuple_##suf<i2, i3>()); \
+    func_##suf##_packipack(tuple_##suf<>(), tuple_##suf<i1>(), tuple_##suf<>()); \
+    func_##suf##_packipack(tuple_##suf<i1>(), tuple_##suf<i2>(), tuple_##suf<>()); \
+    func_##suf##_packipack(tuple_##suf<>(), tuple_##suf<i1>(), tuple_##suf<i2>()); \
+    func_##suf##_packipack(tuple_##suf<i1, i2>(), tuple_##suf<i3>(), tuple_##suf<i4>());
+
+PACKTEST_DECL(int A::*, pmem)
+
+template<void (A::*...i)()> class tuple_pmemfunc {};
+template<void (A::*...T)(), void (A::*...U)()> void func_pmemfunc_packpack(tuple_pmemfunc<T...>, tuple_pmemfunc<U...>) {};
+template<void (A::*...T)(), void (A::* K)(), void (A::*...U)()> void func_pmemfunc_packipack(tuple_pmemfunc<T...>, tuple_pmemfunc<K>, tuple_pmemfunc<U...>) {};
+
+PACKTEST_DECL(template <typename> typename, temp)
+
+template<typename> class temp_temp_00 {};
+template<typename> class temp_temp_01 {};
+template<typename> class temp_temp_02 {};
+template<typename> class temp_temp_03 {};
+
+int arr1[1];
+int arr2[2];
+int arr3[3];
+int arr4[4];
 
 void func() {
     std::cout << pi<int> << pi<char*>;
@@ -104,4 +151,20 @@ void func() {
     // currently the latter is treated as the same function as the previous one,
     // and would generate a C2664 for "cannot convert argument 1 from ......"
     // func_packtpack(std::tuple<int>(1), short(2), std::tuple<char, long>('a', 3));
+
+    func_i_packpack(tuple_i<>(), tuple_i<>());
+    func_i_packpack(tuple_i<1>(), tuple_i<>());
+    func_i_packpack(tuple_i<>(), tuple_i<1>());
+    func_i_packpack(tuple_i<1, 2>(), tuple_i<3>());
+    func_i_packpack(tuple_i<1>(), tuple_i<2, 3>());
+
+    func_i_packipack(tuple_i<>(), arr1, tuple_i<>());
+    func_i_packipack(tuple_i<1>(), arr2, tuple_i<>());
+    func_i_packipack(tuple_i<>(), arr1, tuple_i<2>());
+    func_i_packipack(tuple_i<1, 2>(), arr3, tuple_i<4>());
+    //func_i_packipack(tuple_i<1>(), arr2, tuple_i<3, 4>());
+
+    PACKTEST_CALL(int A::*, pmem, &A::a, &A::b, &A::c, &A::d);
+    PACKTEST_CALL(void (A::*)(), pmemfunc, &A::func_a, &A::func_b, &A::func_c, &A::func_d);
+    PACKTEST_CALL(template <typename> typename, temp, temp_temp_00, temp_temp_01, temp_temp_02, temp_temp_03);
 }

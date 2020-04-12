@@ -50,9 +50,9 @@ TplParaList :=
 
 TplPara :=
     '$$$V'  // empty parameter expansion (type)
-    '$$V'   // empty parameter expansion (type)
+    '$$V'   // empty parameter expansion (type or template)
     '$$Z'   // separater for two consecutive expanstion packs
-    '$S'    // empty parameter expansion (size_t)
+    '$S'    // empty parameter expansion for non-type parameter
     Type    // template template parameter is not distingushable with type template parameter
     IntTplPara      // Non-type template argument of types: Integral / pointer to data member / nullptr_t
     PointerTplPara  // Non-type template argument of types: pointer / l-value reference to object / function; pointer to member function
