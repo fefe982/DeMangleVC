@@ -1,4 +1,4 @@
-Ident :=
+Declaration :=
     '?' QualifiedName IdentType
     '?' QualifiedName IdentType IntConst    // ::__LINE__Var
     '?' QualifiedName '$4' IntConst IntConst CVQThis FuncP  // [thunk] `vtordisp'
@@ -15,6 +15,7 @@ QualifiedName :=
 BaseName :=
     StringTemplateName
     OperatorName
+    BackRefStringName
 
 NameQualifier :=
     ClassNamespaceName
@@ -23,8 +24,8 @@ NameQualifier :=
 ClassNamespaceName :=
     StringTemplateName
     AnoymousNamespaceName
-    '??' Ident              // `Ident'
-    '?'  IntConst           // `IntConst', IntConst here will not begin with A; for static variable inside a function
+    '?' Declaration        // `Declaration'
+    '?' IntConst           // `IntConst', IntConst here will not begin with A; for static variable inside a function
 
 StringTemplateName :=
     StringName
@@ -32,7 +33,7 @@ StringTemplateName :=
     BackRefStringName
 
 StringName :=
-    "[_a-zA-Z][_0-9a-zA-Z]*" '@'
+    AnyValidCPPName '@'
     '<lambda_' "[0-9a-f]{32}" '>@' // generated name for lambda
 
 TemplateName :=
@@ -42,7 +43,7 @@ BackRefStringName :=
     "[1-9]"
 
 AnonymousNamespacename :
-    '?A0x' "[0-9a-f]{6}" '@'
+    '?A0x' "[0-9a-f]+" '@'
 
 TplParaList :=
     TplPara '@'
@@ -67,7 +68,7 @@ IntConst :=
     '?' "[A-P][A-P]+" '@'   // other negtive
 
 PointerTplPara :=
-    '?1' Ident
+    '?1' Declaration
 
 VariableType :=
     VarAccMode Type CVQVar
@@ -110,6 +111,9 @@ Type :=
     ArrType         // Array
     CompoundType    // class; CompoundType is not used as top-level type, but it can be part of RefType or ArrType
     BackRefType
+
+BackRefType :=
+    [0-9]
 
 ArrType :=
     'Y' IntConst{n} Type // The fist IntConst is number of dimension (n), followed by n dimension lengths
@@ -303,9 +307,9 @@ OperatorName :=
     '?__B'   // `managed vector destructor iterator'
     '?__C'   // `eh vector copy constructor iterator'
     '?__D'   // `eh vector vbase copy constructor iterator'
-    '?__E' Ident        // `dynamic initializer for '.''
+    '?__E' Declaration  // `dynamic initializer for '.''
     '?__E' StringName   // `dynamic initializer for '.''
-    '?__F' Ident        // `dynamic atexit destructor for '.''
+    '?__F' Declaration  // `dynamic atexit destructor for '.''
     '?__F' StringName   // `dynamic atexit destructor for '.''
     '?__G'              // `vector copy constructor iterator'
     '?__H'              // `vector vbase copy constructor iterator'
