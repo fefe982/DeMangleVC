@@ -1,16 +1,26 @@
-# Visual studio mangling schema
+# Visual studio mangling scheme
 
 This is mostly guessed from reverse engineering. A context-free grammar description of the schema is available in [CFG.txt](CFG.TXT).
 
-## `Declaration`
+## `IntConst`
 
-The full symbol represetion the declaration of an entity. It always starts with `?`. User defined entities always starts with `?`. There are some compiler-generated entities that do not start with `?`, those out of scope of this article.
+When an integer is to be encoded, the following scheme is used:
 
-The basic structure of a declaration is `? QualifiedName IndetType`, that is a qualified followed by its type. There are some compiler-generated symbols uses something different from this pattern. They are also included in [CFG.txt](CFG.TXT) and discussed in ["special symbols"](special_symbols.md). They will not be included here.
+* `0` to `9` are used to represent integers 1 to 10, `0` for 1, `9` for 10.
+* The numbers 0 and other positive integers are represented in hexdecimal, but the digits used are `A` (for 0) to `P` (for 15). The hexdecimal number ends with a `@`.
+* Minus number has prefix of `?`, followed the encoded form of the absolute value.
+
+For example:
+
+* `0` : 1
+* `9` : 10
+* `A@` : 0
+* `?1` : -2
+* `?K@` : -11
 
 ## `QualifiedName`
 
-C++ has namespaces and classes. The names are always "qualified". In the mangled symbol, it includes a `BaseName` and a possible empty list of `ClassNamespaceName`s. The list of `ClassNamespaceName`s, even if it is empty, ends with a `@`. The order of `ClassNamespaceName` is in reverse to what they do in a C++ qualified-id: inner first scope comes first.
+C++ has namespaces and classes. The names are always "qualified". In the mangled symbol, it includes a `BaseName` and a `NameQualifier`, which a possible empty list of `ClassNamespaceName`s. The list of `ClassNamespaceName`s, even if it is empty, ends with a `@`. The order of `ClassNamespaceName` is in reverse to what they do in a C++ qualified-id: inner first scope comes first.
 
 For example:
 
@@ -93,13 +103,15 @@ int `void __cdecl func(void)'::`2'::b
 
 Note: the demangled output is not valid C++, but followers UndecoratedSymbolNames notation.
 
-The scope index is in the format of `'?' IntConst`, which `IntConst` is an integer. The format of `IntConst` is discussed in a separate section.
+The `main` function and `extern "C"` function are not mangled in a C++ way, the full declaration used here is not actually the function declaration, but would treat the full qualified name of the function as a special variable. See [`VarKind`](#varkind) for more details.
+
+The scope index is in the format of `'?' IntConst`, where [`IntConst`](#intconst) is an positive integer.
 
 The full declaration part is in the format of `'?' Declaration`.
 
-### BackRefStringName
+### `BackRefStringName`
 
-In the whole `Declaration`, the first ten string pieces are numbered 0~9, and if they appear again, they are referenced with just a digit. This index is shared withen the whole `Declaration`, except for a *template-id*, which has its own index. The `Declaration` in full declaration part of a `ClassNamespaceName` also shares the index with outer `Declaration` (or *template-id*).
+In the whole `Declaration`, the first ten string pieces are numbered 0~9, and if they appear again, they are referenced with just a digit. This index is shared within the whole `Declaration`, except for a *template-id*, which has its own index. The `Declaration` in full declaration part of a `ClassNamespaceName` also shares the index with outer `Declaration` (or *template-id*).
 
 `StringName`, anonymous namespace, *template-id*, are all counted. But scope index, `OperatorName` are not.
 
@@ -107,12 +119,230 @@ For example:
 
 ```nohighlight
 ?aaa@?1??0aab@aac@0@YAXXZ@4HA
- ^^0      ^^1 ^^2
-         ^ 0 -- <a>
-                  ^ 0 -- <b>
+ ^^0      ^^1 ^^2                numbering of strings
+         ^ 0                     <a> referring to string number 0
+                  ^ 0            <b> referring to string number 0, again
 
 int `void __cdecl aaa::aac::aab::aaa(void)'::`2'::aaa
                   <b>            <a>              ^^^base
 ```
 
-`aaa` appear three times in this `Declaration`, two are expressed using back reference. Two of `aaa`s are in a sub `Declaration`. The three `aaa` are all differen kind of entity: variable, function, and namespace. In the sub `Declaration`, the `Basename` part is a `BackRefStringName`.
+`aaa` appears three times in this `Declaration`, two are expressed using back reference. Two of `aaa`s are in a sub `Declaration`. The three `aaa` are all differen kinds of entity: variable, function, and namespace. In the sub `Declaration`, the `Basename` part is a `BackRefStringName`.
+
+## `Type`
+
+### `BaseType`
+
+All "basic" types in C++. Most of them use a simple capital letter or an underscore followed by a single capital letter. `nullptr_t` uses `$$T`. Check [CFG.TXT](CFG.TXT) for a full list.
+
+### `CompoundType`
+
+Types for `class`, `union`, `struct`, `enum`, `enum class`. It uses the form of `CompoundSpLt QualifiedName`.
+
+`CompoundSpLt` is `T` (`union`), `U` (`struct`), `V` (`class`) or `W[1-7]` (`enum` / `enum class`). The number following `W` shows the base type of the `enum`, but currently it seems that `W4` is always used.
+
+The `QualifiedName` here is the name of the type.
+
+### `ArrType`
+
+`ArrType` is type for array. Variables of array type are all mangled as pointers. However, arrays type are still needed as they can appear in template paramter, pointer or reference to array.
+
+For a `k` dimension array, it starts with `Y`, followed by `k+1` `IntConst`, and then the `Type` of array element.
+
+The first `IntConst` is the number of dimension of the array. The following `IntConst` specifies the length of each dimension of the array. Array of unknown size would have the length of the dimension as `0`.
+
+```nohighlight
+?m_array@@3PAY30123DA
+          ^           namespace scope
+           ^          pointer
+            ^         no cv-qualifier (array cannot hav cv-qualifier)
+             ^        array
+              ^       4 dimensions
+               ^^^^   lengths of the four dimensions
+                   ^  char (array element type)
+
+char (* m_array)[1][2][3][4]
+```
+
+### `CVQVar`
+
+`CVQVar` shows whether the variable is `const` and/or `volatile`.
+
+`CVQVar` is often a `SimpleCVQVar`, which is `A`, `B`, `C` and `D`, meaning no *cv-qualifier*, `const`, `volatile`, `const volatile`, respectively.
+
+`SimpleCVQVar` can be prefixed by `E`, meaning `__ptr64`.
+
+For pointer to member, `CVQVar` also inlcudes a `NameQualifier` for the class, in the form of `MemberCVQVar NameQualifer`. `MemberCVQVar` uses `Q`, `R`, `S` and `T` to be distingushed from `SimpleCVQVar`.
+
+For example:
+
+```nohighlight
+?pmem_p@@3PQA@@HQ1@
+ ^^^^^^^            Basename
+        ^           empty NameQualifier
+         ^          namespace scope
+          ^         pointer
+           ^        no cv-qualifer for pointer to member
+            ^^^     A:: for pointer to member
+               ^    int, type pointed
+                ^   Final CVQVar, no cv-qualifer for pointer to member
+                 ^^ A::, using BackRefStringName
+
+int A::* pmem_p
+```
+
+Here, the cv-qualifer information is also encoded in the pointer type, so the final CVQVar (Q1@) is ignored. See [`VariableType`](#variabletype) for more information.
+
+
+### `RefType`
+
+Pointers and references are mangled as `RefType`. However, some types that are not pointers or references also uses `RefType`. Unlike `BaseType` and `CompoundType`, `RefType` has `cv-qualifier` encoded within the type.
+
+It takes the basic form of `RefKind CVQVar Type`, while `RefKind` shows the kind of the type (pointer or referece, with *cv-qualifier* encoded), `CVQVar Type` is the referenced type. For pointer to member, the class information is also encoded in `CVQVar` (name only). When `Type` also has *cv-qualifer*, (e.g., when `Type` is a `RefType`,) the *cv-qualifier* in `CVQVar` and `Type` should be the same.
+
+The `RefKind` for pointers and references are:
+
+* `A` : l-value reference `&`
+* `B` : `& volatile`,  it is currently disallowed by C++.
+* `P` : pointer `*`
+* `Q` : `* const`
+* `R` : `* volatile`
+* `S` : `* const volatile`
+* `$$Q` : r-value reference `&&`
+
+Other `RefKind` are:
+
+* `?` : Used for cv-qaulified `CompoundType`. `CompoundType` does not have a cv-qualifier encoded. So when a cv-qualified `CompoundType` is needed (as template parameter, function return type, etc.), a `RefType` with `?` is constructed to add a cv-qualifier.
+* `$$A` : Used for function, e.g. in template parameter.
+* `$$B` : Used for array, e.g. in template parameter. Arrays do not have *cv-qualifier*, so the `CVQType` part is omitted. It takes the form of `$$B ArrType`.
+* `$$C` : Used for array element, when it is cv-qualified, but the type itself do not encode a cv-qualifier (`BaseType`, for example)
+
+#### Function pointer / reference
+
+When function appear in a `RefType` ot form a function pointer, it takes the form of `NonMemCVQFunc FuncP` or `MemCVQFunc NameQualifier CVQThis FuncP`, for non-member or static functions pointers, and pointer to memeber, repectively. Check [Function](#function) introduction for each part.
+
+### `BackRefType`
+
+Just like string, types that has already appeared in the mangled name can be referred to using `0` to `9`. Only "full" type are counted. For example, for a "pointer to pointer to int" type, the "pointer to int" type cannot be referred to as it is not a full type. Types that are represented using only one character (most `BaseType`s) is not counted.
+
+## Function
+
+The components constructing a function may be a little different according where the function appears. Here each component is described.
+
+### `NonMemCVQFunc`
+
+When a non-member function or static member function appear in a `RefType`, in place of `CVQVar`, `NonMemCVQFunc` (`6`) is used.
+
+### `MemCVQFunc`
+
+In a pointer to member, in the place of `CVQVar`, `MemCVQFunc` (`8`) is used. It is then followed by a `NameQualifier`, specifying the class; and then a `CVQThis`, specifying the *cv-qualifier-seq* and *ref-qualifier* after the parameter list for member functions.
+
+### `CVQThis`
+
+`CVQThis` is the same as `CVQVar`, and be prefixed by `G` for *ref-qualifier* `&`, or `H` for *ref-qualifier* `&&`.
+
+### `MemFuncMod`
+
+A single capital letter. Used for member function, showing whether the function is `public`, `protected`, `private`, `virtual`, `static`. See [CFG.TXT](CFG.TXT) for a list.
+
+### `NonMemFuncMod`
+
+Used as a counterpart for `NonMemFuncMod`. Use the letter `Y`.
+
+### `FuncP`
+
+After `NonMemCVQFunc`, or `MemCVQFunc NameQualifier CVQThis`, `FuncP` followers, which includes the calling convension, return type, parameter list, and exception specification, in the form of `CallConv RetType ParamList ExceptSpecifier`
+
+### `CallConv`
+
+`CallConv` is a single capital letter showing the calling convension of the function. Refer to [CFG.TXT](CFG.TXT) for a list of them.
+
+### `RetType`
+
+`RetType` is usually a [`Type`](#type), but it can be `@` for functions that does not have a return type, e.g. constructors and destructors. Functions returning `void` is represented by `X`, as is shown in `BaseType`.
+
+### `ParamList`
+
+`ParamList` is usually a list of `Type`s, ended with `@`.
+
+For function with no parameters, `X` (without the ending `@`) is used. `X` represents `void` in `BaseType`.
+
+The ending `@` can be replaced by `Z`, which show that the paramter list of the function end in ellipsis (`...`). If the whole parameter list is an elipsis, it is represented as a single `Z`.
+
+### `ExceptSpecifier`
+
+It uses the same format as `ParamList`.
+
+C++ has exception specification for function, which used to the form of *dynamic-exception-specification* (`throw(int, short, std::exeception)`). The `ExceptSpecifier` is a list of types mentioned in this *dynamic-exception-specification*. A single `Z` is used when there is no exception specification. This is how `UndecoratedSymbolNames` interpretes the `ExceptSpecifier`.
+
+However, as this is not actually implemented, and the *dynamic-exception-specifiction* being replaced by *noexcept-specifier*, VC++ actullly only generates `Z` for this part.
+
+## `Declaration`
+
+The full symbol represetion the declaration of an entity. It always starts with `?`. User defined entities always starts with `?`. There are some compiler-generated entities that do not start with `?`, those out of scope of this article.
+
+The basic structure of a declaration is `? QualifiedName IdentType`, that is a qualified followed by its type. There are some compiler-generated symbols uses something different from this pattern. They are also included in [CFG.txt](CFG.TXT) and discussed in ["special symbols"](special_symbols.md). They will not be included here.
+
+## `IdentType`
+
+A `Declaration` can be a variable or a function, and has the form of `'?' QualifiedName IdentType`.
+
+`IdentType` is a `VariableType` type for variable, `NonMemFuncMod FuncP` for non-member function, and `MemFuncMod CVQThis FuncP` for member functions.
+
+### `VariableType`
+
+A `VariableType` consists of three part, `VarKind Type CVQVar`. `VarKind` shows the "kind" of the variable. `Type` and `CVQVar` combined should be the type of the variable in the C++ point of view.
+
+In the C++ point of view, `CVQVar` is part of the type information, but not the variable. However, VC++ mangles the top-level CV-qualifier differently. When *cv-qualifier* is also encoded in `Type`, the final `CVQVar` is ignored.
+
+#### `VarKind`
+
+`VarKind` is a single digit from `0` to `9`. Normal variables are classified into five groups, with numbers `0` to `4`. And there are some special variables, which use numbers `5` to `9`:
+
+* `0`: private static member
+* `1`: protected static member
+* `2`: public static member
+* `3`: namespace scope variable
+* `4`: local scope static variable.
+* `5`: local static guard
+* `6`: vftable / RTTI Complete Object Locator
+* `7`: vbtable
+* `8`: RTTI Type Descriptor / RTTI Base Class Descriptor / RTTI Base Class Array / RTTI Class Hierarchy Descriptor
+* `9`: the `main` function / `extern "C"` function
+
+`5` ~ `8` are used for compiler generated special variables, and they have a special structure in the mangled name. See [CFG.txt](CFG.TXT) and [special symbols](special_symbols.md) for more details.
+
+`9` was used in the full declaration of the function in local scope static variable, if the function is the function `main`, or a function that is declared `extern "C"`. the full quaified name of the function is treated as special variable, with number `9`, and nothing follows. No `Type CVQVar` part exists.
+
+```nohighlight
+?local_c_in_c_function@?1??c_function@@9@4VC@@A
+ ^^^^^^^^^^^^^^^^^^^^^                            BaseName
+                       ^^                         Scope Index
+                          ^^^^^^^^^^^^^^          Full declaration for qualified function name
+                                       ^          Special variable kind '9'
+                                        ^         End of ClassNamespaceName List
+
+class C `c_function'::`2'::local_c_in_c_function
+```
+
+## `TemplateName`
+
+A `TemplateName` (represents *template-id* in C++) can appear in `BaseName` or `ClassNamespaceName`. It has the form `'?$' BaseName TplArgList`.
+
+`TplArgList` is possible empty list of `TplArg`, terminated with `@`. `TplArg` represent a template argument, or empty template paramter expansion pack, or separator between consecutive template paramter expansion pack.
+
+There is separate string and type back reference count inside each `TemplateName`. The whole `TemplateName` would be counted as one string in the outer `Declaration` or `TemplateName`.
+
+### `TplArg`
+
+For type template argument, `Type` is used. Top level array or function can only appear here.
+
+For template template argument, `Type` is used. The *template-name* is treated as having the type of the template. It is cannot be distinguished with a type template argument in the mangled name.
+
+For non-type template argument, all integral type or pointer to data member arguments are represented with a `IntConst`, prefixed by `?0` (`IntTplArg`). The type information is lost in the mangled name.
+
+Other pointer or reference type non-type template parameter, `PointerTplArg` is used, which consist of `'?1' Declaration`, which is the full declaration of the entity referred to prefixed by `?1`. Pointer and reference are represented in the same way.
+
+If there is an template paramter expansion pack, and no template argument for it, `$$V` is inserted in the place of template parameter expansion pack for type / template template parameter, and `$S` for non-type template paramter.
+
+If there are two consecutive template paramter expansion packs in the template, a `$$Z` is always inserted between them.

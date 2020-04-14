@@ -42,13 +42,15 @@ The number part in the `vcall` output seems to be an offset in the vftable. The 
 
 ## `typeof`
 
+Need more information
+
 Haven't found a real piece of code that would generate this symbol.
 
 ## `local static guard`
 
-In C++, static variable are only initialized once, and must be thread safe. So usually there is a "guard" to achieve this, preventing multiple initializaiton. The special variab seems to be of this use.
+Need more information
 
-However, I cannot produce this symbol now. Instead, "noraml" local variables with the special names `$TSS0`, `$TSS1` , etc., is used.
+Can generate the symbol with [local_static_guard.cpp](GenNames/local_static_guard.cpp), compliled with `/clr:pure` compiler flag. However, I am not able to get this symbol with pure C++ code.
 
 ## `vbase destructor`
 
@@ -357,3 +359,19 @@ Parameter:
 3. `unsigned int`: size of an object
 4. `unsigned int`: number of objects in the array
 5. `void (__thiscall *)(void *,void *)`: copy constructor of the class
+
+## dyanmic initializer
+
+`??d_c$initializer$@D@@2P6AXXZA@@3P6AXXZA`
+
+``void (__cdecl * `public: static void (__cdecl * D::d_c$initializer$)(void)')(void)``
+
+The demangled name is actually made up by me. The `.asm` output of the compile does not include de demangle name. And `UndecoratedSymbolNames` cannot handle it. The symbol does not follow the rules of the mangling schema, and need special treatment.
+
+It is used to int the `CRT$XCU` section, where dynamic intializer for static variable is strored. These initializers are automatically executed before `main`. Check the microsoft documentation for [CRT Initialization](https://docs.microsoft.com/en-us/cpp/c-runtime-library/crt-initialization) for more details. It is used as the following asm piece:
+
+```asm
+CRT$XCU	SEGMENT
+??d_c$initializer$@D@@2P6AXXZA@@3P6AXXZA DD FLAT:??__E?d_c@D@@2VC@@A@@YAXXZ ; ??d_c$initializer$@D@@2P6AXXZA@@3P6AXXZA
+CRT$XCU	ENDS
+```

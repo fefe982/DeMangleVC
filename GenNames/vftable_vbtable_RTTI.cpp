@@ -1,5 +1,3 @@
-#include <iostream>
-
 // vftable
 // vbtable
 // vcall
@@ -18,24 +16,24 @@
 class vbase {
 public: int x;
       vbase(int k = 0) :x(k) {}
-      virtual void vfoo() { std::cout << "vfoo vbase"; }
-      virtual void vbar() { std::cout << "vbar vbase"; }
-      virtual ~vbase() { std::cout << "vbase destruct\n"; }
+      virtual void vfoo() { }
+      virtual void vbar() { }
+      virtual ~vbase() { }
 };
 
 class one : virtual public  vbase
 {
 public:
     int _a;
-    virtual void vfoo() { std::cout << "vfoo one"; }
-    virtual void afoo() { std::cout << "afoo one"; }
+    virtual void vfoo() { }
+    virtual void afoo() { }
 };
 class two : virtual public  vbase
 {
 public:
     int _b;
-    virtual void vfoo() { std::cout << "vfoo two"; }
-    virtual void bfoo() { std::cout << "bfoo one"; }
+    virtual void vfoo() { }
+    virtual void bfoo() { }
 };
 class three : public one, public two, virtual public vbase
 {
@@ -44,20 +42,20 @@ public:
     virtual int foo() {
         return 0;
     }
-    virtual void vfoo() { std::cout << "vfoo three"; }
-    ~three() { std::cout << "three destruct"; }
+    virtual void vfoo() { }
+    ~three() { }
 };
 
 class four : public three {
 public:
     int d;
-    virtual void vfoo() { std::cout << "vfoo four"; }
+    virtual void vfoo() { }
 };
 
 void f(void(four::*)()) {}
 
 void vftable_vbtable() {
-    four *pf = new four[11];
+    four* pf = new four[11];
     delete[] pf;
     pf = new four;
     delete pf;

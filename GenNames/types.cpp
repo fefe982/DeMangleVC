@@ -1,4 +1,25 @@
-#include<utility>
+template <class T>
+struct remove_reference {
+    using type = T;
+};
+
+template <class T>
+struct remove_reference<T&> {
+    using type = T;
+};
+
+template <class T>
+struct remove_reference<T&&> {
+    using type = T;
+};
+
+template <class T>
+using remove_reference_t = typename remove_reference<T>::type;
+
+template <class T>
+remove_reference_t<T>&& move(T&& _Arg) noexcept {
+    return static_cast<remove_reference_t<T>&&>(_Arg);
+}
 // The observation may not apply to all versions of VS
 // and may change depending on different compiler flags
 
@@ -22,7 +43,8 @@ wchar_t type_wchar_v;
 char16_t type_char16_v;
 char32_t type_char32_v;
 
-nullptr_t null;
+// nullptr_t
+decltype(nullptr) null;
 
 //extended types
 __int8 exttype_int8_v; // same as char
@@ -92,15 +114,15 @@ const char(&refarray____p_array_c_)[7] = array_c_;
 volatile char(&refarray____p_array__v)[7] = array__v;
 const volatile char(&refarray____p_array_cv)[7] = array_cv;
 
-char&& rref___ = std::move(cv____char);
-const char&& rref_c_ = std::move(cv_c__char);
-volatile char&& rref__v = std::move(cv__v_char);
-const volatile char&& rref_cv = std::move(cv_cv_char);
+char&& rref___ = move(cv____char);
+const char&& rref_c_ = move(cv_c__char);
+volatile char&& rref__v = move(cv__v_char);
+const volatile char&& rref_cv = move(cv_cv_char);
 
-char(&&rrefarray____p_array___)[7] = std::move(array___);
-const char(&&rrefarray____p_array_c_)[7] = std::move(array_c_);
-volatile char(&&rrefarray____p_array__v)[7] = std::move(array__v);
-const volatile char(&&rrefarray____p_array_cv)[7] = std::move(array_cv);
+char(&&rrefarray____p_array___)[7] = move(array___);
+const char(&&rrefarray____p_array_c_)[7] = move(array_c_);
+volatile char(&&rrefarray____p_array__v)[7] = move(array__v);
+const volatile char(&&rrefarray____p_array_cv)[7] = move(array_cv);
 
 // class / struct / union / enum
 class A {} class_class;
@@ -122,3 +144,5 @@ A (*class_array)[5] = nullptr;
 const A (*class_array_c)[5] = nullptr;
 volatile A (*class_array_v)[5] = nullptr;
 const volatile A (*class_array_cv)[5] = nullptr;
+
+char(*m_array)[1][2][3][4] = nullptr;

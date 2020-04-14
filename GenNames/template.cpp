@@ -1,4 +1,5 @@
-#include <iostream>
+using nullptr_t = decltype(nullptr);
+
 class A {
 public:
     int a;
@@ -40,8 +41,9 @@ temp_t<std::nullptr_t> temp_t_nullptr_t;
 
 template<typename T> T pi = T();
 
+template<typename, typename> class temp_type_tt;
 template<template<typename, typename> typename T> class temp_temp {};
-temp_temp<std::basic_ostream> temp_temp_ostream;
+temp_temp<temp_type_tt> temp_temp_tt;
 
 enum ENUM {
     e_a,
@@ -87,15 +89,11 @@ temp_t_pack<> temp_t_pack_none;
 temp_t_pack<int> temp_t_pack_int;
 temp_t_pack<int, char> temp_t_pack_int_char;
 
-template<typename...T, typename ...U> void func_packpack(std::tuple<T...>, std::tuple<U...>) {};
+template<typename...> class tuple{};
 
-template<typename...T, typename K, typename ...U> void func_packtpack(std::tuple<T...>, K, std::tuple<U...>) {};
+template<typename...T, typename ...U> void func_packpack(tuple<T...>, tuple<U...>) {};
 
-template<int...i> class tuple_i {};
-
-template<int...T, int ...U> void func_i_packpack(tuple_i<T...>, tuple_i<U...>) {};
-
-template<int...T, int K, int ...U> void func_i_packipack(tuple_i<T...>, int(&arr)[K], tuple_i<U...>) {};
+template<typename...T, typename K, typename ...U> void func_packtpack(tuple<T...>, K, tuple<U...>) {};
 
 #define PACKTEST_DECL(type, suf) \
 template<type...i> class tuple_##suf {};\
@@ -113,6 +111,8 @@ template<type...T, type K, type ...U> void func_##suf##_packipack(tuple_##suf<T.
     func_##suf##_packipack(tuple_##suf<>(), tuple_##suf<i1>(), tuple_##suf<i2>()); \
     func_##suf##_packipack(tuple_##suf<i1, i2>(), tuple_##suf<i3>(), tuple_##suf<i4>());
 
+PACKTEST_DECL(typename, t)
+PACKTEST_DECL(int, i)
 PACKTEST_DECL(int A::*, pmem)
 
 template<void (A::*...i)()> class tuple_pmemfunc {};
@@ -126,44 +126,29 @@ template<typename> class temp_temp_01 {};
 template<typename> class temp_temp_02 {};
 template<typename> class temp_temp_03 {};
 
-int arr1[1];
-int arr2[2];
-int arr3[3];
-int arr4[4];
-
 void func() {
-    std::cout << pi<int> << pi<char*>;
+    auto _1 = pi<int>;
+    auto _2 = pi<char*>;
     // a `$$Z` is used between packs
-    func_packpack(std::tuple<>(), std::tuple<>());
-    func_packpack(std::tuple<int>(1), std::tuple<>());
-    func_packpack(std::tuple<>(), std::tuple<int>(1));
-    func_packpack(std::tuple<int, short>(1, 2), std::tuple<long>(3));
-    func_packpack(std::tuple<int>(1), std::tuple<short, long>(2, 3));
+    func_packpack(tuple<>(), tuple<>());
+    func_packpack(tuple<int>(), tuple<>());
+    func_packpack(tuple<>(), tuple<int>());
+    func_packpack(tuple<int, short>(), tuple<long>());
+    func_packpack(tuple<int>(), tuple<short, long>());
 
     // no `$$Z` appears after any pack, and may have resulted the last two
     // functions (one in comment) to be treated as the same function
-    func_packtpack(std::tuple<>(), 1, std::tuple<>());
-    func_packtpack(std::tuple<int>(1), 1, std::tuple<>());
-    func_packtpack(std::tuple<>(), 1, std::tuple<int>(1));
-    func_packtpack(std::tuple<int, short>(1, 2), 1, std::tuple<long>(3));
-    func_packtpack(std::tuple<int>(1), 1, std::tuple<short, long>(2, 3));
-    func_packtpack(std::tuple<int, short>(1, 2), 'a', std::tuple<long>(3));
+    func_packtpack(tuple<>(), 1, tuple<>());
+    func_packtpack(tuple<int>(), 1, tuple<>());
+    func_packtpack(tuple<>(), 1, tuple<int>());
+    func_packtpack(tuple<int, short>(), 1, tuple<long>());
+    func_packtpack(tuple<int>(), 1, tuple<short, long>());
+    func_packtpack(tuple<int, short>(), 'a', tuple<long>());
     // currently the latter is treated as the same function as the previous one,
     // and would generate a C2664 for "cannot convert argument 1 from ......"
-    // func_packtpack(std::tuple<int>(1), short(2), std::tuple<char, long>('a', 3));
+    // func_packtpack(tuple<int>(), short(2), tuple<char, long>());
 
-    func_i_packpack(tuple_i<>(), tuple_i<>());
-    func_i_packpack(tuple_i<1>(), tuple_i<>());
-    func_i_packpack(tuple_i<>(), tuple_i<1>());
-    func_i_packpack(tuple_i<1, 2>(), tuple_i<3>());
-    func_i_packpack(tuple_i<1>(), tuple_i<2, 3>());
-
-    func_i_packipack(tuple_i<>(), arr1, tuple_i<>());
-    func_i_packipack(tuple_i<1>(), arr2, tuple_i<>());
-    func_i_packipack(tuple_i<>(), arr1, tuple_i<2>());
-    func_i_packipack(tuple_i<1, 2>(), arr3, tuple_i<4>());
-    //func_i_packipack(tuple_i<1>(), arr2, tuple_i<3, 4>());
-
+    PACKTEST_CALL(int, i, 1, 2, 3, 4);
     PACKTEST_CALL(int A::*, pmem, &A::a, &A::b, &A::c, &A::d);
     PACKTEST_CALL(void (A::*)(), pmemfunc, &A::func_a, &A::func_b, &A::func_c, &A::func_d);
     PACKTEST_CALL(template <typename> typename, temp, temp_temp_00, temp_temp_01, temp_temp_02, temp_temp_03);
