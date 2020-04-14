@@ -1,4 +1,25 @@
-#include <utility>
+template <class T>
+struct remove_reference {
+    using type = T;
+};
+
+template <class T>
+struct remove_reference<T&> {
+    using type = T;
+};
+
+template <class T>
+struct remove_reference<T&&> {
+    using type = T;
+};
+
+template <class T>
+using remove_reference_t = typename remove_reference<T>::type;
+
+template <class T>
+remove_reference_t<T>&& move(T&& _Arg) noexcept {
+    return static_cast<remove_reference_t<T>&&>(_Arg);
+}
 class A {
 public:
     // special member, no return value
@@ -76,8 +97,8 @@ void func() {
     a.func_ref_c();
     a.func_ref_v();
     a.func_ref_cv();
-    std::move(a).func_rref();
-    std::move(a).func_rref_c();
-    std::move(a).func_rref_v();
-    std::move(a).func_rref_cv();
+    move(a).func_rref();
+    move(a).func_rref_c();
+    move(a).func_rref_v();
+    move(a).func_rref_cv();
 }

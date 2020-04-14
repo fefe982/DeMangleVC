@@ -5,12 +5,11 @@ Declaration :=
     '?' QualifiedName '$A' Type 'A'         // [thunk] `local static destructor helper'
     '?' QualifiedName '$B' IntConst 'AE'    // [thunk] `vcall'
     '?' QualifiedName '$C' QualifiedName    // `virtual displacement map'
-    '??' "[_a-zA-Z][_0-9a-zA-Z]*" '$initializer$@' NameQualifier '@' '2P6AXXZA' '@@3P6AXXZA'
+    '??' AnyValidCPPName '$initializer$@' NameQualifier '@2P6AXXZA@@3P6AXXZA'
     StringLiteral
 
 QualifiedName :=
-    BaseName '@'
-    BaseName NameQualifier '@'
+    BaseName NameQualifier
 
 BaseName :=
     StringTemplateName
@@ -18,7 +17,7 @@ BaseName :=
     BackRefStringName
 
 NameQualifier :=
-    ClassNamespaceName
+    '@'
     ClassNamespaceName NameQualifier
 
 ClassNamespaceName :=
@@ -37,7 +36,7 @@ StringName :=
     '<lambda_' "[0-9a-f]{32}" '>@' // generated name for lambda
 
 TemplateName :=
-    '?$' BaseName TplParaList
+    '?$' BaseName TplArgList
 
 BackRefStringName :=
     "[1-9]"
@@ -45,20 +44,20 @@ BackRefStringName :=
 AnonymousNamespacename :
     '?A0x' "[0-9a-f]+" '@'
 
-TplParaList :=
-    TplPara '@'
-    TplPara TplParaList
+TplArgList :=
+    '@'
+    TplArg TplArgList
 
-TplPara :=
+TplArg :=
     '$$$V'  // empty parameter expansion (type)
     '$$V'   // empty parameter expansion (type or template)
     '$$Z'   // separater for two consecutive expanstion packs
     '$S'    // empty parameter expansion for non-type parameter
     Type    // template template parameter is not distingushable with type template parameter
-    IntTplPara      // Non-type template argument of types: Integral / pointer to data member / nullptr_t
-    PointerTplPara  // Non-type template argument of types: pointer / l-value reference to object / function; pointer to member function
+    IntTplArg      // Non-type template argument of types: Integral / pointer to data member / nullptr_t
+    PointerTplArg  // Non-type template argument of types: pointer / l-value reference to object / function; pointer to member function
 
-IntTplPara :=
+IntTplArg :=
     '$0' IntConst
 
 IntConst :=
@@ -67,11 +66,11 @@ IntConst :=
     '?' "[0-9]"          // -1 ~ -10
     '?' "[A-P][A-P]+" '@'   // other negtive
 
-PointerTplPara :=
+PointerTplArg :=
     '?1' Declaration
 
 VariableType :=
-    VarAccMode Type CVQVar
+    VarKind Type CVQVar
     '5' IntConst            // local static guard
     '6B@'                   // vftable / RTTI Complete Object Locator
     '6B' QualifiedName '@'  // vftable / RTTI Complete Object Locator for QualifiedName
@@ -81,7 +80,7 @@ VariableType :=
     '9'                     // used for the function name for local scope static variable
 
 
-VarAccMode :=
+VarKind :=
     0   // private: static
     1   // protected: static
     2   // public: static
@@ -91,7 +90,7 @@ VarAccMode :=
 CVQVar :=
     SimpleCVQVar
     'E' SimpleCVQVar    // __ptr64
-    MemberCVQVar NameQualifier '@' // used in pointer to member, NameQualier part specifies the "CLASS::" part
+    MemberCVQVar NameQualifier // used in pointer to member, NameQualifier part specifies the "CLASS::" part
 
 SimpleCVQVar :=
     'A'     //
@@ -119,14 +118,14 @@ ArrType :=
     'Y' IntConst{n} Type // The fist IntConst is number of dimension (n), followed by n dimension lengths
 
 RefType :=
-    RefSpLt CVQType
-    RefSpLt Func
+    RefKind CVQType
+    RefKind Func
     '$$B' ArrType // Array use alone, not part of other RefType. Has no CVQ part.
 
 CVQType :=
     CVQVar Type
 
-RefSpLt :=
+RefKind :=
     ?   // -- not a reference type. Used when a (possibly cv-qualified) CompoundType is used alone.
     A   // &
     B   // & volatile
@@ -149,7 +148,7 @@ CompoundSpLt :=
 
 Func :=
     NonMemCVQFunc FuncP
-    MemCVQFunc ClassNamespaceList CVQThis FuncP  // used for pionter to member function
+    MemCVQFunc NameQualifier CVQThis FuncP  // used for pionter to member function
 
 CVQThis :=
     CVQVar
@@ -163,7 +162,7 @@ MemCVQFunc :=
     8
 
 FuncP :=
-    CallConv RetType ParamList ThrowParamList
+    CallConv RetType ParamList ExceptSpecifier
 
 CallConv :=
     'A'     // __cdecl
@@ -179,7 +178,7 @@ CallConv :=
     'M'     // __clrcall
     'Q'     // __vectorcall
 
-ThrowParamList: =
+ExceptSpecifier: =
     ParamList
 
 ParamList :=
