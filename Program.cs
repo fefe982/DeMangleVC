@@ -603,39 +603,26 @@ namespace DeMangleVC
             string suffix = "";
             switch (src[iProcessPos])
             {
+                case 'E':
+                    iProcessPos++;
+                    suffix = "__ptr64";
+                    break;
+                case 'G':
+                    suffix = "&";
+                    iProcessPos++;
+                    break;
+                case 'H':
+                    iProcessPos++;
+                    suffix = "&&";
+                    break;
+            }
+            switch (src[iProcessPos])
+            {
                 case 'A':
                 case 'B':
                 case 'C':
                 case 'D':
-                case 'E':
-                case 'G':
-                case 'H':
-                    if (src[iProcessPos] == 'E')
-                    {
-                        suffix = "__ptr64";
-                        iProcessPos++;
-                    }
-                    else if (src[iProcessPos] == 'G')
-                    {
-                        suffix = "&";
-                        iProcessPos++;
-                    }
-                    else if (src[iProcessPos] == 'H')
-                    {
-                        suffix = "&&";
-                        iProcessPos++;
-                    }
-                    switch (src[iProcessPos])
-                    {
-                        case 'A':
-                        case 'B':
-                        case 'C':
-                        case 'D':
-                            _strRes = str_cv[src[iProcessPos] - 'A'];
-                            break;
-                        default:
-                            throw new Exception("Unrecognized CV-Qualifier " + src[iProcessPos]);
-                    }
+                    _strRes = str_cv[src[iProcessPos] - 'A'];
                     if (_bIgnoreNormalCV && suffix == "")
                     {
                         _strRes = "";
@@ -733,6 +720,13 @@ namespace DeMangleVC
                 case 'A':
                 case 'B':
                 case 'P':
+                    if (string.CompareOrdinal(src, iProcessPos, "P$A", 0, 3) == 0)
+                    {
+                        _strReferenceType = "^";
+                        iProcessPos += 2;
+                        break;
+                    }
+                    goto case 'Q';
                 case 'Q':
                 case 'R':
                 case 'S':
@@ -1077,11 +1071,6 @@ namespace DeMangleVC
             int iProcessPos = pos;
             if (_bHasThis)
             {
-                if (src[iProcessPos] == 'E')
-                {
-                    _strCVQThis = "__ptr64";
-                    iProcessPos++;
-                }
                 _strCVQThis = new CVQ().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString() + _strCVQThis;
             }
             _strCallConversion = strCallConv[src[iProcessPos] - 'A'];
@@ -1934,25 +1923,12 @@ namespace DeMangleVC
                     sIdent = sIdent + "{for `" + forDst + "'}";
                 }
             }
-            else if (Char.IsLetter(src[iProcessPos])) // function
-            {
-                String sModifier;
-                FunctionModifier funcM = new FunctionModifier();
-                funcM.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                sModifier = funcM.getDemangledString();//getFunctionModifier(out bHasThis, out sThunkAdjustor);
-                if (sModifier.Length > 0)
-                {
-                    sModifier = sModifier + " ";
-                }
-                TypeFunctionBase func = new TypeFunctionBase(funcM.bHasThis);
-                func.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                String sFuncBody = func.getDeclaration(qID.getDemangledString() + funcM.sThunkAdjustor);
-                sIdent = sModifier + sFuncBody;
-            }
             else
             {
+                char managed_function = ' ';
                 if (src[iProcessPos] == '$')
                 {
+                    managed_function = '$';
                     long val;
                     iProcessPos++;
                     switch (src[iProcessPos])
@@ -2004,13 +1980,41 @@ namespace DeMangleVC
                                 sIdent = qID.getDemangledString() + "{for " + qIDFor.getDemangledString() + "}";
                             }
                             break;
+                        case '$':
+                            iProcessPos++;
+                            if (src[iProcessPos] == 'F' || src[iProcessPos] == 'H')
+                            {
+                                managed_function = src[iProcessPos];
+                                iProcessPos++;
+                            }
+                            else
+                            {
+                                throw new Exception();
+                            }
+                            break;
                         default:
                             throw new Exception();
                     }
                 }
-                else
+
+                if ((managed_function != ' ' && managed_function != '$') || (managed_function == ' ' && Char.IsLetter(src[iProcessPos]))) // function
                 {
-                    throw new Exception();
+                    String sModifier;
+                    FunctionModifier funcM = new FunctionModifier();
+                    funcM.parse(src, ref iProcessPos, ref vType, ref vUiD);
+                    sModifier = funcM.getDemangledString();//getFunctionModifier(out bHasThis, out sThunkAdjustor);
+                    if (sModifier.Length > 0)
+                    {
+                        sModifier = sModifier + " ";
+                    }
+                    TypeFunctionBase func = new TypeFunctionBase(funcM.bHasThis);
+                    func.parse(src, ref iProcessPos, ref vType, ref vUiD);
+                    String sFuncBody = func.getDeclaration(qID.getDemangledString() + funcM.sThunkAdjustor);
+                    sIdent = sModifier + sFuncBody;
+                    if (managed_function != ' ')
+                    {
+                        sIdent = "/*managed " + managed_function + "*/" + sIdent;
+                    }
                 }
             }
             _strRes = sIdent;
