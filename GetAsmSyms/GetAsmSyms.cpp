@@ -5,7 +5,7 @@
 #include <map>
 #include <filesystem>
 
-std::regex regexSymbol(R"(^(?:[^;]*\s)?(\?[^\s:,]+)[\s:].*?(?:;\s*(.+))?$)");
+std::regex regexSymbol(R"(^(?:[^;]*\s)?(\?[^\s:,]+)(?:[\s:].*?(?:;\s*(.+))?)?$)");
 
 int main(int argc, char **argv)
 {
