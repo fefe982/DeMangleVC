@@ -60,5 +60,8 @@
     <ClCompile Include="local_static_guard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="string_literal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -1843,6 +1843,12 @@ namespace DeMangleVC
                         _strRes += shortString[src[iProcessPos] - '0'];
                         iProcessPos++;
                     }
+                    else if ((src[iProcessPos] >= 'A' && src[iProcessPos] <= 'Z') || (src[iProcessPos] >= 'a' && src[iProcessPos] <= 'z'))
+                    {
+                        int val = src[iProcessPos] + 0x80;
+                        _strRes += "\\x" + String.Format("{0:X2}", val);
+                        iProcessPos++;
+                    }
                     else
                     {
                         throw new Exception("Error in String literal");

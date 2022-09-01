@@ -40,5 +40,3 @@ int main(int argc, char** argv) {
 extern "C" void c_function() {
     static C local_c_in_c_function;
 }
-
-

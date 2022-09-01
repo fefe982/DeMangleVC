@@ -1,5 +1,3 @@
-#include <iostream>
-
 // exception handling is turn off for this file
 // (the flag /EHsc is not set)
 
@@ -15,18 +13,16 @@
 class vbase {
 public: int x;
       vbase(int k = 0) :x(k) {}
-      virtual void vfoo() { std::cout << "vfoo vbase"; }
-      virtual void vbar() { std::cout << "vbar vbase"; }
-      virtual ~vbase() { std::cout << "vbase destruct\n"; }
+      virtual void vfoo() { }
+      virtual void vbar() { }
+      virtual ~vbase() { }
 };
 
 class one : virtual public vbase {
 public:
     one() = default;
     ~one() = default;
-    one(const one&) {
-        std::cout << "one copy\n";
-    }
+    one(const one&) { }
 };
 
 class wrap {
@@ -37,12 +33,8 @@ public:
 
 class two {
 public:
-    two() {
-        std::cout << "two construct\n";
-    }
-    ~two() {
-        std::cout << "two destruct\n";
-    }
+    two() { }
+    ~two() { }
 };
 
 void generated_ctor_dtor() {

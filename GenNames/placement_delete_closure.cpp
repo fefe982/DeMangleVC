@@ -1,12 +1,9 @@
-#include <iostream>
 class C {};
 
 class MyClass {
 
 public:
-    MyClass() {
-        std::cout << "xxx";
-    }
+    MyClass() { }
     // Placement new operator
     void* operator new (size_t sz, C) {
         return nullptr;

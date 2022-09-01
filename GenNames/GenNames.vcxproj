@@ -58,6 +58,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
       <RemoveUnreferencedCodeData>false</RemoveUnreferencedCodeData>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -116,6 +117,7 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/await %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ClCompile Include="placement_delete_closure.cpp" />
+    <ClCompile Include="string_literal.cpp" />
     <ClCompile Include="template.cpp">
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpplatest</LanguageStandard>
     </ClCompile>
