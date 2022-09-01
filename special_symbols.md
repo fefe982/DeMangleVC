@@ -10,9 +10,9 @@
 
 ``const three::`vftable'{for `one'}``
 
-The virtual function table. The first entry is the `RTTI Complete Object Locator`, and the rest is the collection of addresses for the final overload of all the virtual functions within a class.
+The virtual function table. The first entry of the table is the `RTTI Complete Object Locator`, and the rest entries are the addresses of the final overriders of all the virtual functions in the class.
 
-If there is multiple inheritance, and there is a need to generate a vftable for each of the bases, there will be a "for" part in this symbol, naming each of the bases needed.
+In the situation of multiple inheritance, there may be a need to generate a vftable for each of the bases. There will be a "for" part in this symbol, naming each of the bases in this case.
 
 ## `vbtable`
 
@@ -26,7 +26,7 @@ If there is multiple inheritance, and there is a need to generate a vftable for 
 
 The virtual base table, contains informaion for virtual bases.
 
-If there is multiple inheritance, the vbtable may be generated for each of the virtual base. It will be demangled with a for part in the "vbtable".
+If there are multiple virtual bases, the vbtable may be generated for each of the virtual bases. It will contain a `for` part in the "vbtable" in this case.
 
 ## `vcall`
 
@@ -50,7 +50,7 @@ Haven't found a real piece of code that would generate this symbol.
 
 Need more information
 
-Can generate the symbol with [local_static_guard.cpp](GenNames/local_static_guard.cpp), compliled with `/clr:pure` compiler flag. However, I am not able to get this symbol with pure C++ code.
+Can generate this symbol with [local_static_guard.cpp](GenNames/local_static_guard.cpp), compiled with `/clr:pure` compiler flag. However, I am not able to get this symbol with pure C++ code.
 
 ## `vbase destructor`
 
@@ -72,11 +72,11 @@ For classes which has virtual bases, the "normal" destructor function generated 
 
 ``[thunk]:public: virtual void * __thiscall four::`vector deleting destructor'`vtordisp{-4,0}' (unsigned int)``
 
-Generated function for `delete[]` expression, and can be put into the `vftable` if the destructor is virtual. When it is put into the `vftable`, it may need a thunk ot adjust the `this` pointer. The thunk is the second version of the example above.
+Generated function for `delete[]` expression, and can be put into the `vftable` if the destructor is virtual. When it is put into the `vftable`, it may need a thunk to adjust the `this` pointer. The thunk is the second version of the examples above.
 
 It calls the destructors of every element, then calls `operator delete[]` or `operator delete` to release the memory.
 
-The parameter is a flag which determines where to destruct one or all elementer, and whether to call `operator delete` or `operator delete[]`. The flas is set according to how the function is called. For example, for `delete[]`, all are deleted and `operator delete[]` is used. When it is called from the `vftable` by `delete`, `operator delete` is used.
+The parameter is a flag which determines where to destruct one or all elementer, and whether to call `operator delete` or `operator delete[]`. The flag is set according to how the function is called. For example, for `delete[]`, all are deleted and `operator delete[]` is used. When it is called from the `vftable` by `delete`, `operator delete` is used.
 
 ## `default constructor closure`
 
@@ -95,9 +95,9 @@ In the latter case, when a default constructor with no parameters is needed by t
 
 ``public: virtual void * __thiscall two::`scalar deleting destructor'(unsigned int)``
 
-Generated wrap function for `delete` expresion or explicte destructor call, calls destructor and (optionally) `operator delete`.
+Generated wrap function for `delete` expresion or explicit destructor call, calls destructor and (optionally) `operator delete`.
 
-The flag parameter controls where `operator delete` should be called.
+The flag parameter controls whether `operator delete` should be called.
 
 ## `vector constructor iterator`
 
@@ -135,7 +135,7 @@ paramters:
 
 ``void __stdcall `vector vbase constructor iterator'(void *,unsigned int,unsigned int,void * (__thiscall *)(void *))``
 
-Library function to construct an array of class objects with virtual bases. Genterated constructor function for classes with virtual bases has a hidden paramter `_$initVBases$`, which controls where the virtual base should be initialized in the contrusctor. So the iterator function is different from `vector constructor iterator`.
+Library function to construct an array of class objects with virtual bases. Genterated constructor function for classes with virtual bases has a hidden paramter `_$initVBases$`, which controls whether the virtual base should be initialized in the contrusctor. So the iterator function is different from `vector constructor iterator`.
 
 parameters:
 
@@ -150,7 +150,7 @@ parameters:
 
 ``x::B::`virtual displacement map'{for x::C}``
 
-It is helper structure which helps casting between pointer to member functions in the two classes. Usually multiple inheritance / virtual function / virtual bases are involved.
+It is a helper structure which helps casting between pointer to member functions in the two classes. Usually multiple inheritance / virtual function / virtual bases are involved.
 
 ## `eh vector constructor iterator`
 
@@ -203,10 +203,10 @@ parameters:
 
 ``public: void __thiscall TestClassA::`copy constructor closure'(class TestClassA &)``
 
-Generated copy contructor, and wraps the actually which has more parameters, but all but the first have default values.
+Generated copy contructor. It wraps the a copy constructor with more than one parameters, but only the first one does not have default argument.
 
-The copy constructor in C++ has only one parameter, or all but the first paramter have default argument.
-In the latter case, when a copy constructor with only one parameters is needed by the compiler, a `copy constructor closure` is generated to wrap up the original constructor.
+The copy constructor in C++ has only one parameter, or all but the first parameter have default arguments.
+In the latter case, when a copy constructor with only one parameter is needed by the compiler, a `copy constructor closure` is generated to wrap up the original copy constructor.
 
 ## `RTTI Type Descriptor`
 
@@ -222,7 +222,7 @@ A struct (of type `std::type_info`) that contains the runtime type information.
 
 ``four::`RTTI Base Class Descriptor at (0,-1,0,64)'``
 
-A structure that describe a base class object. The data contains `RTTI Type Descriptor` of the base class, number of bases that base has, offset of the base class object (`vftable`), an atribute, and the `RTTI Class Hierarchy Descriptor`.
+A structure that describe a base class object. The data contains `RTTI Type Descriptor` of the base class, number of bases that base has, offset of the base class object (`vftable`), an attribute, and the `RTTI Class Hierarchy Descriptor`.
 
 The numbers mangled in the name is the offset (first three numbers) and attribute.
 
@@ -232,7 +232,7 @@ The numbers mangled in the name is the offset (first three numbers) and attribut
 
 ``four::`RTTI Base Class Array'``
 
-An array of `RTTI Base Class Descriptor` for all (direct and inderect) base classes. The first entry is the class itself.
+An array of `RTTI Base Class Descriptor` for all (direct and indirect) base classes. The first entry is the class itself.
 
 ## `RTTI Class Hierarchy Descriptor`
 
@@ -240,7 +240,7 @@ An array of `RTTI Base Class Descriptor` for all (direct and inderect) base clas
 
 ``four::`RTTI Class Hierarchy Descriptor'``
 
-A structure describes class dierarchy. It contains attribute that shows multiple / virtual inheritance, count of bases classes (including self), and `RTTI Base Class Array`.
+A structure describes class hierarchy. It contains attribute that shows multiple / virtual inheritance, count of bases classes (including self), and `RTTI Base Class Array`.
 
 ## `RTTI Complete Object Locator`
 
@@ -262,7 +262,7 @@ This structure contains information about the offset of the class within the com
 
 Used to replace the `vftable` for object of `dllimport`ed class created by `new`.
 
-The `vector deleting destructor` is put into the `vftable` if the destructor is virtual, can it calls `operator delete`. However, for `dllimport`ed classes, the `operator delete` inside the DLL (which is called by the `vector deleting destructor` in the DLL) may not be the same with the one in the exe. It may not match the `operator new` in the EXE, which may cause problems. To resolve this, for these classes, a `local vftable` is generated to replace the original `vftable` in the object, after normal object construct in the EXE. In the `local vftable`, the destructor calls the `operator delete` in the EXE.
+The `vector deleting destructor` is put into the `vftable` if the destructor is virtual, and it calls `operator delete`. However, for `dllimport`ed classes, the `operator delete` inside the DLL (which is called by the `vector deleting destructor` in the DLL) may not be the same with the one in the exe. It may not match the `operator new` in the EXE, which may cause problems. To resolve this, for these classes, a `local vftable` is generated to replace the original `vftable` in the object, after normal object construct in the EXE. In the `local vftable`, the destructor calls the `operator delete` in the EXE.
 
 Details see [here](https://groups.google.com/forum/#!msg/microsoft.public.vc.language/atSh_2VSc2w/EgJ3r_7OzVUJ).
 
@@ -366,9 +366,9 @@ Parameter:
 
 ``void (__cdecl * `public: static void (__cdecl * D::d_c$initializer$)(void)')(void)``
 
-The demangled name is actually made up by me. The `.asm` output of the compile does not include de demangle name. And `UndecoratedSymbolNames` cannot handle it. The symbol does not follow the rules of the mangling schema, and need special treatment.
+The demangled name is actually made up by me. The `.asm` output of the compiler does not have a demangle name. And `UndecoratedSymbolNames` cannot handle it. The symbol does not follow the rules of the mangling schema, so special treatment is required.
 
-It is used to int the `CRT$XCU` section, where dynamic intializer for static variable is strored. These initializers are automatically executed before `main`. Check the microsoft documentation for [CRT Initialization](https://docs.microsoft.com/en-us/cpp/c-runtime-library/crt-initialization) for more details. It is used as the following asm piece:
+It is used in the `CRT$XCU` section, where dynamic intializer for static variable is stored. These initializers are automatically executed before `main`. Check the microsoft documentation for [CRT Initialization](https://docs.microsoft.com/en-us/cpp/c-runtime-library/crt-initialization) for more details. It is used in the following asm piece:
 
 ```asm
 CRT$XCU	SEGMENT
