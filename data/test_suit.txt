@@ -43,3 +43,4 @@
 ?p64@@3PEADEA p64
 ??0Object@Platform@@Q$AAA@XZ Platform::Object::Object
 ??_R4RA@@6BObject@Platform@@IWeakReferenceSource@Details@2@@ RA::`RTTI Complete Object Locator'
+??0__abi_FTMWeakRefData@@QAE@P$AAVObject@Platform@@@Z

@@ -614,11 +614,6 @@ namespace DeMangleVC
                     {
                         suffix = "__ptr64";
                         iProcessPos++;
-                        if (src[iProcessPos] == '$' && src[iProcessPos + 1] == 'A')
-                        {
-                            suffix = "^";
-                            iProcessPos += 2;
-                        }
                     }
                     else if (src[iProcessPos] == 'G')
                     {
@@ -745,15 +740,15 @@ namespace DeMangleVC
                     {
                         _strReferenceType = strTypeE[src[iProcessPos] - 'A'];
                         iProcessPos++;
-                        if (src[iProcessPos - 1] >= 'P' && src[iProcessPos - 1] <= 'S' && src[iProcessPos + 1] == '$' && src[iProcessPos+2] == 'A')
-                        {
-                            _strReferenceType = "*" + _strReferenceType.Substring(1);
-                            iProcessPos += 2;
-                        }
                     }
                     else
                     {
                         _strReferenceType = strType[src[iProcessPos] - 'A'];
+                    }
+                    if (src[iProcessPos + 1] == '$' && src[iProcessPos + 2] == 'A')
+                    {
+                        _strReferenceType = "^" + _strReferenceType.Substring(1);
+                        iProcessPos += 2;
                     }
                     break;
                 case '?': // type transfered by value
