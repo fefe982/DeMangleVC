@@ -1925,7 +1925,7 @@ namespace DeMangleVC
             {
                 TypeVarType sType = new TypeVarType();
                 sType.parse(src, ref iProcessPos, ref vType, ref vUiD);
-                String forDst = "";
+                List<String> forDst = new List<string>();
                 if (iProcessPos < src.Length)
                 {
                     switch (src[iProcessPos])
@@ -1933,14 +1933,14 @@ namespace DeMangleVC
                         default:
                             if (qID.getDemangledString().EndsWith("::`vftable'") || qID.getDemangledString().EndsWith("::`vbtable'") || qID.getDemangledString().EndsWith("::`RTTI Complete Object Locator'") || qID.getDemangledString().EndsWith("::`local vftable'"))
                             {
-                                if (src[iProcessPos] != '@')
+                                while (src[iProcessPos] != '@')
                                 {
-                                    forDst = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+                                    forDst.Add(new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString());
                                 }
                                 iProcessPos++;
                             }
                             else if (qID.getDemangledString().EndsWith("::__LINE__Var"))
-                            {   // generated cont var for __LINE__ , may contain arbitrary hash to avoid confiliction
+                            {   // generated cont var for __LINE__ , may contain arbitrary hash to avoid confliction
                                 if (src[iProcessPos] != '@' || iProcessPos < src.Length - 9)
                                 {
                                     throw new Exception();
@@ -1951,9 +1951,9 @@ namespace DeMangleVC
                     }
                 }
                 sIdent = sType.getDeclaration(qID.getDemangledString());
-                if (forDst != "")
+                if (forDst.Count > 0)
                 {
-                    sIdent = sIdent + "{for `" + forDst + "'}";
+                    sIdent = sIdent + "{for `" + String.Join("'s ", forDst) + "'}";
                 }
             }
             else if (Char.IsLetter(src[iProcessPos])) // function

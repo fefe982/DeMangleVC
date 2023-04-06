@@ -42,3 +42,4 @@ char const (* const `main'::`2'::d)[10]
 `anonymous namespace'::B::`virtual displacement map'{for `anonymous namespace'::C}
 char * __ptr64 p64
 public: __cdecl Platform::Object::Object(void)
+const RA::`RTTI Complete Object Locator'{for `Platform::Object's Platform::Details::IWeakReferenceSource'}
