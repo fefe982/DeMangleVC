@@ -248,6 +248,8 @@ In a pointer to member, in the place of `CVQVar`, `MemCVQFunc` (`8`) is used. It
 
 `CVQThis` is basically the same as `CVQVar`, and also be `CVQVar` prefixed by `G` for *ref-qualifier* `&`, or `H` for *ref-qualifier* `&&`.
 
+With Windows Runtime support, ref class member function has `CVQVar` of `$A`， which is for `^` (handle);
+
 ### `MemFuncMod`
 
 A single capital letter. Used for member function, showing whether the function is `public`, `protected`, `private`, `virtual`, `static`. See [CFG.TXT](CFG.TXT) for a list.

@@ -63,5 +63,8 @@
     <ClCompile Include="string_literal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WinRuntim_types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

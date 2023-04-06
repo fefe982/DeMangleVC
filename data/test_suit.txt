@@ -40,3 +40,5 @@
 ?c@?1??main@@9@4PAY09DA `main'::`2'::c
 ?d@?1??main@@9@4QAY09$$CBDA `main'::`2'::d
 ??_KB@?A0x70e3a004@@$CC@1@ `anonymous namespace'::B::`virtual displacement map'
+?p64@@3PEADEA p64
+??0Object@Platform@@Q$AAA@XZ Platform::Object::Object

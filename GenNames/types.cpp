@@ -78,6 +78,10 @@ const char* const pointer_c__p_c__c = &cv_c__char;
 const char* volatile pointer__v_p_c__c;
 const char* const volatile pointer_cv_p_c__c = &cv_c__char;
 
+// __ptr32 / __ptr64
+char* __ptr32 p32 = &cv____char;
+char* __ptr64 p64 = &cv____char;
+
 auto dummy00 = &pointer_c__p____c;
 auto dummy01 = &pointer_cv_p____c;
 auto dummy02 = &pointer_c__p_c__c;

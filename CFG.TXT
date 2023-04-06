@@ -154,6 +154,7 @@ CVQThis :=
     CVQVar
     'G' CVQVar // &
     'H' CVQVar // &&
+    '$A' CVQVar // ^ ; CVQVar can only be 'A', others are not supported by the language
 
 NonMemCVQFunc :=
     6   // normal

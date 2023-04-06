@@ -614,6 +614,11 @@ namespace DeMangleVC
                     {
                         suffix = "__ptr64";
                         iProcessPos++;
+                        if (src[iProcessPos] == '$' && src[iProcessPos + 1] == 'A')
+                        {
+                            suffix = "^";
+                            iProcessPos += 2;
+                        }
                     }
                     else if (src[iProcessPos] == 'G')
                     {
@@ -740,6 +745,11 @@ namespace DeMangleVC
                     {
                         _strReferenceType = strTypeE[src[iProcessPos] - 'A'];
                         iProcessPos++;
+                        if (src[iProcessPos - 1] >= 'P' && src[iProcessPos - 1] <= 'S' && src[iProcessPos + 1] == '$' && src[iProcessPos+2] == 'A')
+                        {
+                            _strReferenceType = "*" + _strReferenceType.Substring(1);
+                            iProcessPos += 2;
+                        }
                     }
                     else
                     {
@@ -1081,6 +1091,12 @@ namespace DeMangleVC
                 {
                     _strCVQThis = "__ptr64";
                     iProcessPos++;
+                }
+                if (src[iProcessPos] == '$' && src[iProcessPos+1] =='A')
+                {
+                    // `this` is always ^ on ref class for WinRT, so it is not shown
+                    // just likt `this` is always * for normal classes, but * is not shown at the end of the function
+                    iProcessPos+=2;
                 }
                 _strCVQThis = new CVQ().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString() + _strCVQThis;
             }
