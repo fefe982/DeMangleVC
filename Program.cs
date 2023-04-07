@@ -601,6 +601,12 @@ namespace DeMangleVC
             int iProcessPos = pos;
             _bMemThis = false;
             string suffix = "";
+            if (src[iProcessPos] == '$' && src[iProcessPos + 1] == 'A')
+            {
+                // shows that this cv is used for handle
+                // The generation of the handle symbol is usually in other parts of the mangled name 
+                iProcessPos += 2;
+            }
             switch (src[iProcessPos])
             {
                 case 'A':
@@ -1607,6 +1613,7 @@ namespace DeMangleVC
                             _eUnqualifiedIdType = UnqualifiedID.enumUnqualifiedID.enmIdentifier;
                             break;
                         case 'Q':
+                            iProcessPos++;
                             string strPart = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
                             _strRes = "[" +strPart + "]";
                             _eUnqualifiedIdType = UnqualifiedID.enumUnqualifiedID.enmIdentifier;
