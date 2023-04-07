@@ -46,3 +46,4 @@
 ??0__abi_FTMWeakRefData@@QAE@P$AAVObject@Platform@@@Z
 ?GetWeakReference@?QIWeakReferenceSource@Details@Platform@@RA@@U$AAAP$AAUIWeakReference@23@XZ
 ??$_Construct_n@AEBQEAPEAXAEBQEAPEAX@?$vector@PEAXV?$allocator@PEAX@std@@@std@@AEAAX_KAEBQEAPEAX1@Z$rtcFrameData
+??$?VX@Concurrency@@YA?A_PAEBV?$task@X@0@0@Z

@@ -362,7 +362,7 @@ namespace DeMangleVC
             "unsigned __int128",
             "bool",
             "_O",
-            "_P",
+            "auto",
             "_Q",
             "_R",
             "char16_t",
@@ -464,6 +464,7 @@ namespace DeMangleVC
                         case 'L':
                         case 'M':
                         case 'N':
+                        case 'P':
                         case 'S':
                         case 'T':
                         case 'U':
