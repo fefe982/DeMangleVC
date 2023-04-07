@@ -115,6 +115,17 @@ Note: the demangled output is not valid C++, but follows `UnDecorateSymbolName` 
 
 The `main` function and `extern "C"` function are not mangled in a C++ way, the full declaration used here is not the actual function declaration, but would treat the full qualified name of the function as a special variable. See [`VarKind`](#varkind) for more details.
 
+#### Qualified name in bracket
+
+Exact meaning Unkown.
+
+```nohighlight
+?GetWeakReference@?QIWeakReferenceSource@Details@Platform@@RA@@U$AAAP$AAUIWeakReference@23@XZ
+                  ^^                 begin of qualified name in bracket
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ full qualified name
+public: virtual struct Platform::Details::IWeakReference ^ __cdecl RA::[Platform::Details::QIWeakReferenceSource]::GetWeakReference(void)
+```
+
 ### `BackRefStringName`
 
 In the whole `Declaration`, the first ten string pieces are numbered 0~9, and if they appear again, they are referenced with just a digit. This index is shared within the whole `Declaration`, except for [`TemplateName`](#templatename), which has its own index. The `Declaration` in full declaration part of a `ClassNamespaceName` also shares the index with outer `Declaration` (or `TemplateName`).

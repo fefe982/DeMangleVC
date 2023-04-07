@@ -44,3 +44,4 @@ char * __ptr64 p64
 public: __cdecl Platform::Object::Object(void)
 const RA::`RTTI Complete Object Locator'{for `Platform::Object's Platform::Details::IWeakReferenceSource'}
 public: __thiscall __abi_FTMWeakRefData::__abi_FTMWeakRefData(class Platform::Object ^)
+public: virtual struct Platform::Details::IWeakReference ^ __cdecl RA::[Platform::Details::QIWeakReferenceSource]::GetWeakReference(void)

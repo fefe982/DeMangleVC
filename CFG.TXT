@@ -22,9 +22,13 @@ NameQualifier :=
 
 ClassNamespaceName :=
     StringTemplateName
-    AnoymousNamespaceName
-    '?' Declaration        // `Declaration'
+    AnoymousNamespaceName  // '?A0x'
+    '?' Declaration        // '??', `Declaration'
     '?' IntConst           // `IntConst', IntConst here will not begin with A; for static variable inside a function
+    '?Q' QualifiedName     //  `[foo::bar]', meaning unknown
+
+AnoymousNamespaceName :=
+    '?A0x' [0-9a-f]{8} '@'
 
 StringTemplateName :=
     StringName

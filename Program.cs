@@ -1606,6 +1606,11 @@ namespace DeMangleVC
                             _strRes = "`" + val.ToString() + "\'";
                             _eUnqualifiedIdType = UnqualifiedID.enumUnqualifiedID.enmIdentifier;
                             break;
+                        case 'Q':
+                            string strPart = new QualifiedID().parse(src, ref iProcessPos, ref vType, ref vUiD).getDemangledString();
+                            _strRes = "[" +strPart + "]";
+                            _eUnqualifiedIdType = UnqualifiedID.enumUnqualifiedID.enmIdentifier;
+                            break;
                         case 'A':
                             parseAnonymousNameSpace(src, ref iProcessPos);
                             vUiD.Add(this);
