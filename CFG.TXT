@@ -378,6 +378,7 @@ NonVoidType :=
     '_M' // unsigned __int128
     '_N' // bool
     '_S' // char16_t
+    '_T' // decltype(auto)
     '_U' // char32_t
     '_W' // wchar_t
     '$$T' // nullptr_t

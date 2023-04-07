@@ -366,7 +366,7 @@ namespace DeMangleVC
             "_Q",
             "_R",
             "char16_t",
-            "_T",
+            "decltype(auto)",
             "char32_t",
             "_V",
             "wchar_t",
@@ -465,6 +465,7 @@ namespace DeMangleVC
                         case 'M':
                         case 'N':
                         case 'S':
+                        case 'T':
                         case 'U':
                         case 'W':
                             retType = new TypeSimple(strType_[src[iProcessPos] - 'A']);
