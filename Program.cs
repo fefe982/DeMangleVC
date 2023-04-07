@@ -1978,6 +1978,11 @@ namespace DeMangleVC
                 func.parse(src, ref iProcessPos, ref vType, ref vUiD);
                 String sFuncBody = func.getDeclaration(qID.getDemangledString() + funcM.sThunkAdjustor);
                 sIdent = sModifier + sFuncBody;
+                if (iProcessPos < src.Length && src[iProcessPos] == '$')
+                {
+                    sIdent = "`" + src.Substring(iProcessPos + 1) + "' for " + sIdent;
+                    iProcessPos = src.Length;
+                }
             }
             else
             {

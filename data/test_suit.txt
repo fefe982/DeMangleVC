@@ -45,3 +45,4 @@
 ??_R4RA@@6BObject@Platform@@IWeakReferenceSource@Details@2@@ RA::`RTTI Complete Object Locator'
 ??0__abi_FTMWeakRefData@@QAE@P$AAVObject@Platform@@@Z
 ?GetWeakReference@?QIWeakReferenceSource@Details@Platform@@RA@@U$AAAP$AAUIWeakReference@23@XZ
+??$_Construct_n@AEBQEAPEAXAEBQEAPEAX@?$vector@PEAXV?$allocator@PEAX@std@@@std@@AEAAX_KAEBQEAPEAX1@Z$rtcFrameData
