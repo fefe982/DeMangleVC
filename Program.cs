@@ -1909,6 +1909,11 @@ namespace DeMangleVC
 
     class Declaration : StringComponent
     {
+        public Declaration(bool isOutMostDecl = false)
+        {
+            _isOutMostDecl = isOutMostDecl;
+        }
+        private bool _isOutMostDecl;
         private QualifiedID qID;
         public QualifiedID QualifiedID
         {
@@ -1979,7 +1984,7 @@ namespace DeMangleVC
                 func.parse(src, ref iProcessPos, ref vType, ref vUiD);
                 String sFuncBody = func.getDeclaration(qID.getDemangledString() + funcM.sThunkAdjustor);
                 sIdent = sModifier + sFuncBody;
-                if (iProcessPos < src.Length && src[iProcessPos] == '$')
+                if (_isOutMostDecl && iProcessPos < src.Length && src[iProcessPos] == '$')
                 {
                     sIdent = "`" + src.Substring(iProcessPos + 1) + "' for " + sIdent;
                     iProcessPos = src.Length;
@@ -2071,7 +2076,7 @@ namespace DeMangleVC
 
         public void Work()
         {
-            Declaration d = new Declaration();
+            Declaration d = new Declaration(true);
             List<Type> vType = new List<Type>();
             List<UnqualifiedID> vUiD = new List<UnqualifiedID>();
             iProcessPos = 0;
