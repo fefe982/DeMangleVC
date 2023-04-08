@@ -758,6 +758,11 @@ namespace DeMangleVC
                         _strReferenceType = "^" + _strReferenceType.Substring(1);
                         iProcessPos += 2;
                     }
+                    else if (iProcessPos + 7 <= src.Length && src.Substring(iProcessPos + 1, 6) == "$01E$A")
+                    {   // meaning unknown
+                        _strReferenceType = "^" + _strReferenceType.Substring(1);
+                        iProcessPos += 6;
+                    }
                     break;
                 case '?': // type transfered by value
                     break;

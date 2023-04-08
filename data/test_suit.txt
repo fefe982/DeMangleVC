@@ -48,3 +48,4 @@
 ??$_Construct_n@AEBQEAPEAXAEBQEAPEAX@?$vector@PEAXV?$allocator@PEAX@std@@@std@@AEAAX_KAEBQEAPEAX1@Z$rtcFrameData
 ??$?VX@Concurrency@@YA?A_PAEBV?$task@X@0@0@Z
 ??$func_pmemfunc_packipack@$1?func_a@A@@QAEXXZ$1?func_b@2@QAEXXZ$1?func_c@2@QAEXXZ$1?func_d@2@QAEXXZ@@YAXV?$tuple_pmemfunc@$1?func_a@A@@QAEXXZ$1?func_b@2@QAEXXZ@@V?$tuple_pmemfunc@$1?func_c@A@@QAEXXZ@@V?$tuple_pmemfunc@$1?func_d@A@@QAEXXZ@@@Z
+?get@?Q?$IBoxArray@E@Platform@@Value@?$Array@E$00@2@UE$AAAP$01E$AAV42@XZ
