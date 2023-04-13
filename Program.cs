@@ -718,11 +718,14 @@ namespace DeMangleVC
         public override string getDeclaration(string qID, bool bEnclose = false)
         {
             String strDecl = "";
-            if (_strReferenceType.Length > 2)
+            char[] seperator ={ ' ' };
+            String[] refTypes = _strReferenceType.Split(seperator);
+            for (int i = 1; i < refTypes.Length; i++)
             {
-                if (qID.StartsWith(_strReferenceType.Substring(2)))
+                String tail = String.Join(" ", refTypes, refTypes.Length - i, i) + " ";
+                if (qID.StartsWith(tail))
                 {
-                    qID = qID.Substring(_strReferenceType.Length - 1);
+                    qID = qID.Substring(tail.Length);
                 }
             }
             if (StrCVQualifier.EndsWith("::"))
