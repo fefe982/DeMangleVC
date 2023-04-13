@@ -49,3 +49,4 @@
 ??$?VX@Concurrency@@YA?A_PAEBV?$task@X@0@0@Z
 ??$func_pmemfunc_packipack@$1?func_a@A@@QAEXXZ$1?func_b@2@QAEXXZ$1?func_c@2@QAEXXZ$1?func_d@2@QAEXXZ@@YAXV?$tuple_pmemfunc@$1?func_a@A@@QAEXXZ$1?func_b@2@QAEXXZ@@V?$tuple_pmemfunc@$1?func_c@A@@QAEXXZ@@V?$tuple_pmemfunc@$1?func_d@A@@QAEXXZ@@@Z
 ?get@?Q?$IBoxArray@E@Platform@@Value@?$Array@E$00@2@UE$AAAP$01E$AAV42@XZ
+?__abi_Windows_Foundation_?$EventHandler@PE$AAVObject@Platform@@___abi_IDelegate____abi_Invoke@?Q__abi_IDelegate@?$EventHandler@PE$AAVObject@Platform@@@Foundation@Windows@@234@UE$AAAJPE$AAVObject@Platform@@0@Z

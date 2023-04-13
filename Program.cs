@@ -23,19 +23,20 @@ namespace DeMangleVC
                         line = line.Substring(0, idx);
                     }
                     DeMangle dm = new DeMangle(line);
-                    try
-                    {
-                        dm.Work();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Error.WriteLine(line);
-                        Console.Error.WriteLine(dm.processPos);
-                        Console.Error.WriteLine(e.Data);
-                        Console.Error.WriteLine(e.Message);
-                        Console.Error.WriteLine(e.Source);
-                        Console.Error.WriteLine(e.StackTrace);
-                    }
+                    dm.Work();
+                    //try
+                    //{
+                    //    dm.Work();
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.Error.WriteLine(line);
+                    //    Console.Error.WriteLine(dm.processPos);
+                    //    Console.Error.WriteLine(e.Data);
+                    //    Console.Error.WriteLine(e.Message);
+                    //    Console.Error.WriteLine(e.Source);
+                    //    Console.Error.WriteLine(e.StackTrace);
+                    //}
                     String res = dm.GetResult();
                     Console.WriteLine(res);
                     line = sr.ReadLine();
@@ -112,6 +113,14 @@ namespace DeMangleVC
         public override string getDemangledString() { return _strRes; }
         public static string getString(string src, ref int pos)
         {
+            // specials, meaning unknown
+            String[] specials = { "__abi_Windows_Foundation_" };
+            foreach (String special in specials) {
+                if ((pos + special.Length) <= src.Length && src.Substring(pos, special.Length) == special) {
+                    pos += special.Length;
+                    return "`" + special + "'";
+                }
+            }
             int startPos = pos;
             int i = 0;
             while (src[pos + i] != '@')
@@ -391,8 +400,9 @@ namespace DeMangleVC
         public override string getDemangledString() { return getDeclaration("###"); }
         public static Type GetTypeLikeID(string src, ref int pos, ref List<Type> vType, ref List<UnqualifiedID> vUiD, bool topLevelType = false)
         {
-            Type retType;
+            Type retType = null;
             int iProcessPos = pos;
+            String[] specials = { "___abi_IDelegate____abi_Invoke" };
             switch (src[iProcessPos])
             {
                 case 'C':
@@ -473,7 +483,19 @@ namespace DeMangleVC
                             iProcessPos++;
                             break;
                         default:
-                            throw new Exception("Type specific letter _" + new String(src[iProcessPos], 1) + " not found");
+                            foreach (String special in specials)
+                            {
+                                if (special.Length + iProcessPos - 1 <= src.Length && src.Substring(iProcessPos - 1, special.Length) == special)
+                                {
+                                    retType = new TypeSimple("`" + special + "'");
+                                    iProcessPos += special.Length - 1;
+                                    break;
+                                }
+                            }
+                            if (retType == null) {
+                                throw new Exception("Type specific letter _" + new String(src[iProcessPos], 1) + " not found");
+                            }
+                            break;
                     }
                     break;
                 case '$': // special type or type like identifier
